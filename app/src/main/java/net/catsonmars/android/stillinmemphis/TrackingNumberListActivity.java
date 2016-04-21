@@ -4,17 +4,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 
 import net.catsonmars.android.stillinmemphis.dummy.DummyContent;
 
@@ -36,6 +35,9 @@ public class TrackingNumberListActivity extends AppCompatActivity {
      */
     private boolean mTwoPane;
 
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private View mRecyclerView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,9 +56,17 @@ public class TrackingNumberListActivity extends AppCompatActivity {
             }
         });
 
-        View recyclerView = findViewById(R.id.trackingnumber_list);
-        assert recyclerView != null;
-        setupRecyclerView((RecyclerView) recyclerView);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refresh();
+            }
+        });
+
+        mRecyclerView = findViewById(R.id.trackingnumber_list);
+        assert mRecyclerView != null;
+        setupRecyclerView((RecyclerView) mRecyclerView);
 
         if (findViewById(R.id.trackingnumber_detail_container) != null) {
             // The detail container view will be present only in the
@@ -69,6 +79,12 @@ public class TrackingNumberListActivity extends AppCompatActivity {
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
         recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(DummyContent.ITEMS));
+    }
+
+    private void refresh() {
+        Snackbar.make(mRecyclerView, "Refreshing...", Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show();
+//        startService(new Intent(this, UpdaterService.class));
     }
 
     public class SimpleItemRecyclerViewAdapter

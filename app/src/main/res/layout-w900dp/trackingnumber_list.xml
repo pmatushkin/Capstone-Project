@@ -16,18 +16,24 @@
     master/detail flow.
     
     -->
-
-    <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/trackingnumber_list"
-        android:name="net.catsonmars.android.stillinmemphis.TrackingNumberListFragment"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
         android:layout_width="@dimen/item_width"
         android:layout_height="match_parent"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        app:layoutManager="LinearLayoutManager"
-        tools:context="net.catsonmars.android.stillinmemphis.TrackingNumberListActivity"
-        tools:listitem="@layout/trackingnumber_list_content" />
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/trackingnumber_list"
+            android:name="net.catsonmars.android.stillinmemphis.TrackingNumberListFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            app:layoutManager="LinearLayoutManager"
+            tools:context="net.catsonmars.android.stillinmemphis.TrackingNumberListActivity"
+            tools:listitem="@layout/trackingnumber_list_content" />
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 
     <FrameLayout
         android:id="@+id/trackingnumber_detail_container"

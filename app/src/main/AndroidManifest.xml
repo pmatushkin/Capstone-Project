@@ -27,6 +27,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="net.catsonmars.android.stillinmemphis.TrackingNumberListActivity" />
         </activity>
+
+        <service
+            android:name=".data.USPSWebToolsService"
+            android:exported="false"></service>
     </application>
 
 </manifest>
