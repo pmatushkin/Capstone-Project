@@ -1,7 +1,9 @@
 package net.catsonmars.android.stillinmemphis;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -10,11 +12,13 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import net.catsonmars.android.stillinmemphis.data.UpdaterService;
 import net.catsonmars.android.stillinmemphis.dummy.DummyContent;
 
 import java.util.List;
@@ -28,6 +32,7 @@ import java.util.List;
  * item details side-by-side using two vertical panes.
  */
 public class TrackingNumberListActivity extends AppCompatActivity {
+    private static final String TAG = "NumberListActivity";
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -77,15 +82,56 @@ public class TrackingNumberListActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Dispatch onStart() to all fragments.  Ensure any created loaders are
+     * now started.
+     */
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        IntentFilter intentFilter = new IntentFilter(UpdaterService.BROADCAST_ACTION_DATA_CHANGE);
+        intentFilter.addAction(UpdaterService.BROADCAST_ACTION_STATE_CHANGE);
+
+        registerReceiver(mRefreshingReceiver, intentFilter);
+//
+//        registerReceiver(mRefreshingReceiver,
+//                new IntentFilter(UpdaterService.BROADCAST_ACTION_DATA_CHANGE));
+    }
+
+    @Override
+    protected void onStop() {
+        unregisterReceiver(mRefreshingReceiver);
+
+        super.onStop();
+    }
+
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
         recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(DummyContent.ITEMS));
     }
 
     private void refresh() {
-        Snackbar.make(mRecyclerView, "Refreshing...", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show();
-//        startService(new Intent(this, UpdaterService.class));
+        startService(new Intent(this, UpdaterService.class));
     }
+
+    private boolean mIsRefreshing = false;
+
+    private void updateRefreshingUI() {
+        mSwipeRefreshLayout.setRefreshing(mIsRefreshing);
+    }
+
+    private BroadcastReceiver mRefreshingReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (UpdaterService.BROADCAST_ACTION_STATE_CHANGE.equals(intent.getAction())) {
+                mIsRefreshing = intent.getBooleanExtra(UpdaterService.EXTRA_REFRESHING, false);
+                updateRefreshingUI();
+            } else if (UpdaterService.BROADCAST_ACTION_DATA_CHANGE.equals(intent.getAction())) {
+                Log.d(TAG, "received BROADCAST_ACTION_DATA_CHANGE");
+                setupRecyclerView((RecyclerView) mRecyclerView);
+            }
+        }
+    };
 
     public class SimpleItemRecyclerViewAdapter
             extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {

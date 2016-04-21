@@ -29,8 +29,10 @@
         </activity>
 
         <service
-            android:name=".data.USPSWebToolsService"
-            android:exported="false"></service>
+            android:name=".data.UpdaterService"
+            android:exported="false">
+
+        </service>
     </application>
 
 </manifest>
