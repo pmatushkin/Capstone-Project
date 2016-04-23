@@ -12,14 +12,13 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import net.catsonmars.android.stillinmemphis.data.UpdaterService;
 import net.catsonmars.android.stillinmemphis.dummy.DummyContent;
+import net.catsonmars.android.stillinmemphis.sync.StillInMemphisSyncAdapter;
 import net.catsonmars.android.stillinmemphis.sync.StillInMemphisSyncService;
 
 import java.util.List;
@@ -93,13 +92,10 @@ public class TrackingNumberListActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        IntentFilter intentFilter = new IntentFilter(UpdaterService.BROADCAST_ACTION_DATA_CHANGE);
-        intentFilter.addAction(UpdaterService.BROADCAST_ACTION_STATE_CHANGE);
+        IntentFilter intentFilter = new IntentFilter(StillInMemphisSyncAdapter.BROADCAST_ACTION_DATA_CHANGE);
+        intentFilter.addAction(StillInMemphisSyncAdapter.BROADCAST_ACTION_STATE_CHANGE);
 
         registerReceiver(mRefreshingReceiver, intentFilter);
-//
-//        registerReceiver(mRefreshingReceiver,
-//                new IntentFilter(UpdaterService.BROADCAST_ACTION_DATA_CHANGE));
     }
 
     @Override
@@ -114,9 +110,7 @@ public class TrackingNumberListActivity extends AppCompatActivity {
     }
 
     private void refresh() {
-//        StillInMemphisSyncService.syncImmediately(this);
-
-        startService(new Intent(this, UpdaterService.class));
+        StillInMemphisSyncService.syncImmediately(this);
     }
 
     private boolean mIsRefreshing = false;
@@ -128,12 +122,9 @@ public class TrackingNumberListActivity extends AppCompatActivity {
     private BroadcastReceiver mRefreshingReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (UpdaterService.BROADCAST_ACTION_STATE_CHANGE.equals(intent.getAction())) {
-                mIsRefreshing = intent.getBooleanExtra(UpdaterService.EXTRA_REFRESHING, false);
+            if (StillInMemphisSyncAdapter.BROADCAST_ACTION_STATE_CHANGE.equals(intent.getAction())) {
+                mIsRefreshing = intent.getBooleanExtra(StillInMemphisSyncAdapter.EXTRA_REFRESHING, false);
                 updateRefreshingUI();
-            } else if (UpdaterService.BROADCAST_ACTION_DATA_CHANGE.equals(intent.getAction())) {
-                Log.d(TAG, "received BROADCAST_ACTION_DATA_CHANGE");
-                setupRecyclerView((RecyclerView) mRecyclerView);
             }
         }
     };
