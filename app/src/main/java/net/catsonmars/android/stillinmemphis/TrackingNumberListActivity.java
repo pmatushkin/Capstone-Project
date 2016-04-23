@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import net.catsonmars.android.stillinmemphis.data.UpdaterService;
 import net.catsonmars.android.stillinmemphis.dummy.DummyContent;
+import net.catsonmars.android.stillinmemphis.sync.StillInMemphisSyncService;
 
 import java.util.List;
 
@@ -80,6 +81,8 @@ public class TrackingNumberListActivity extends AppCompatActivity {
             // activity should be in two-pane mode.
             mTwoPane = true;
         }
+
+        StillInMemphisSyncService.initializeSyncAdapter(this);
     }
 
     /**
@@ -111,6 +114,8 @@ public class TrackingNumberListActivity extends AppCompatActivity {
     }
 
     private void refresh() {
+//        StillInMemphisSyncService.syncImmediately(this);
+
         startService(new Intent(this, UpdaterService.class));
     }
 

@@ -1,4 +1,9 @@
 <resources>
-    <string name="app_name">Still In Memphis</string>
+    <string name="app_name" translatable="false">Still In Memphis</string>
     <string name="title_trackingnumber_detail">Tracking Number Detail</string>
+
+    <!-- SyncAdapter strings -->
+    <string name="sync_account_type" translatable="false">stillinmemphis.catsonmars.net</string>
+    <string name="content_authority" translatable="false">net.catsonmars.android.stillinmemphis.sync.provider</string>
+
 </resources>
