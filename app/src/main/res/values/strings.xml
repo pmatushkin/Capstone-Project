@@ -6,4 +6,11 @@
     <string name="sync_account_type" translatable="false">stillinmemphis.catsonmars.net</string>
     <string name="content_authority" translatable="false">net.catsonmars.android.stillinmemphis.sync.provider</string>
 
+    <!--USPS Web Tools Track/Confirm Fields API url-->
+    <string name="usps_scheme" translatable="false">http</string>
+    <string name="usps_authority" translatable="false">production.shippingapis.com</string>
+    <string name="usps_path" translatable="false">ShippingAPI.dll</string>
+    <string name="usps_api_parameter" translatable="false">API</string>
+    <string name="usps_api_value" translatable="false">TrackV2</string>
+    <string name="usps_xml_parameter" translatable="false">XML</string>
 </resources>

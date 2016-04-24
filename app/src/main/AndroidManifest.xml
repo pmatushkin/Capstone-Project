@@ -36,14 +36,6 @@
                 android:value="net.catsonmars.android.stillinmemphis.TrackingNumberListActivity" />
         </activity>
 
-        <!--<service-->
-            <!--android:name=".data.UpdaterService"-->
-            <!--android:exported="false" />-->
-        <!--<service-->
-            <!--android:name=".sync.StillInMemphisSyncService"-->
-            <!--android:enabled="true"-->
-            <!--android:exported="true" />-->
-
         <!--Authenticator service-->
         <service
             android:name=".sync.StillInMemphisAuthenticatorService"
@@ -66,8 +58,7 @@
         <!--Sync service-->
         <service
             android:name=".sync.StillInMemphisSyncService"
-            android:exported="true"
-            android:process=":sync">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.content.SyncAdapter"/>
             </intent-filter>

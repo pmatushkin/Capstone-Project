@@ -19,7 +19,7 @@ public class StillInMemphisSyncService extends Service {
 
     // Interval at which to sync with the USPS web service, in seconds.
     // 60 seconds (1 minute) * 180 = 3 hours
-    public static final int SYNC_INTERVAL = 60 * 180;
+    public static final int SYNC_INTERVAL = 10;//60 * 180;
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL/3;
 
     private static final Object sSyncAdapterLock = new Object();
@@ -131,6 +131,22 @@ public class StillInMemphisSyncService extends Service {
         Bundle bundle = new Bundle();
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+
+        ContentResolver.requestSync(getSyncAccount(context),
+                context.getString(R.string.content_authority), bundle);
+    }
+
+    /**
+     * Helper method to have the sync adapter sync immediately
+     * @param context The context used to access the account service
+     */
+    public static void syncImmediatelyWithTrackingNumber(Context context, String trackingNumber) {
+        Log.d(TAG, "StillInMemphisSyncService.syncImmediately()");
+
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        bundle.putString(StillInMemphisSyncAdapter.EXTRA_TRACKING_NNMBER, trackingNumber);
 
         ContentResolver.requestSync(getSyncAccount(context),
                 context.getString(R.string.content_authority), bundle);
