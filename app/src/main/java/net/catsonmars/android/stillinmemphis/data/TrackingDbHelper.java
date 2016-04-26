@@ -21,10 +21,14 @@ public class TrackingDbHelper extends SQLiteOpenHelper {
 
     public TrackingDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+
+        Log.d(TAG, "TrackingDbHelper.TrackingDbHelper()");
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        Log.d(TAG, "TrackingDbHelper.onCreate()");
+
         // Create a table to hold packages.
         final String SQL_CREATE_PACKAGES_TABLE = "CREATE TABLE " + PackagesEntry.TABLE_NAME + " (" +
                 PackagesEntry._ID + " INTEGER PRIMARY KEY," +
@@ -62,6 +66,8 @@ public class TrackingDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        Log.d(TAG, "TrackingDbHelper.onUpgrade()");
+
         // This database is only a cache for online data, so its upgrade policy is
         // to simply to discard the data and start over
         // Note that this only fires if you change the version number for your database.
