@@ -40,6 +40,10 @@ public class TrackingContract {
             " ON " + EventsEntry.TABLE_NAME + "." + EventsEntry.COLUMN_PACKAGE_ID +
             " = " + PackagesEntry.TABLE_NAME + "." + PackagesEntry._ID;
 
+    public static String FORMAT_DATE_TIME = "MMMM dd, yyyy hh:mm a";
+    public static String FORMAT_DATE = "MMMM dd, yyyy";
+    public static String FORMAT_TIME = "hh:mm a";
+
     /**
      * This is the date/time logic:
      * - assumption: all USPS time stamps belong to the same time zone: UTC
@@ -61,12 +65,17 @@ public class TrackingContract {
         Date currentDate = new Date();
 
         // http://developer.android.com/reference/java/text/SimpleDateFormat.html
-        SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy HH:mm a", Locale.US);
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-        SimpleDateFormat sdfDate = new SimpleDateFormat("MMMM dd, yyyy", Locale.US);
-        sdfDate.setTimeZone(TimeZone.getTimeZone("UTC"));
-        SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm a", Locale.US);
-        sdfTime.setTimeZone(TimeZone.getTimeZone("UTC"));
+        SimpleDateFormat sdf = new SimpleDateFormat(FORMAT_DATE_TIME, Locale.US);
+        sdf.setLenient(false);
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+
+        SimpleDateFormat sdfDate = new SimpleDateFormat(FORMAT_DATE, Locale.US);
+        sdfDate.setLenient(false);
+        sdfDate.setTimeZone(TimeZone.getTimeZone("GMT"));
+
+        SimpleDateFormat sdfTime = new SimpleDateFormat(FORMAT_TIME, Locale.US);
+        sdfTime.setLenient(false);
+        sdfTime.setTimeZone(TimeZone.getTimeZone("GMT"));
 
         if ((null == dateValue) || "".equals(dateValue)) {
             Log.d(TAG, "dateValue is missing");
@@ -81,7 +90,7 @@ public class TrackingContract {
             Date midnightTime = new Date(0);
             timeValue = sdfTime.format(midnightTime);
         }
-        Log.d(TAG, "dateValue: " + timeValue);
+        Log.d(TAG, "timeValue: " + timeValue);
 
         String dateString = dateValue + " " + timeValue;
         Log.d(TAG, "dateString: " + dateString);
