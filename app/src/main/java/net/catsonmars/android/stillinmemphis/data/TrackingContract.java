@@ -217,6 +217,10 @@ public class TrackingContract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
+        public static Uri buildEventPackage(long packageId) {
+            return CONTENT_URI.buildUpon().appendPath(String.valueOf(packageId)).build();
+        }
+
         public static String getPackageIdFromUri(Uri uri) {
             Log.d(TAG, "EventsEntry.getPackageIdFromUri()");
 
