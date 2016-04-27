@@ -69,6 +69,22 @@ public class StillInMemphisSyncAdapter extends AbstractThreadedSyncAdapter {
         Log.d(TAG, "StillInMemphisSyncAdapter.StillInMemphisSyncAdapter( , , )");
     }
 
+//    @Override
+//    public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
+//        String dateValue = "February 23, 2016";
+//        String timeValue = "11:32 am";
+//
+//        long normalizedDate = TrackingContract.normalizeDate(dateValue, timeValue);
+//
+//        Date date = new Date(normalizedDate);
+//        SimpleDateFormat sdf = new SimpleDateFormat(TrackingContract.FORMAT_DATE_TIME, Locale.US);
+//        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+//
+//        Log.d(TAG, sdf.format(date));
+//        // complete sync
+//        onSyncCompleted();
+//    }
+
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         Log.d(TAG, "StillInMemphisSyncAdapter.onPerformSync()");
@@ -170,18 +186,10 @@ public class StillInMemphisSyncAdapter extends AbstractThreadedSyncAdapter {
                                 // parse the response
                                 document = documentBuilder.parse(new InputSource(new StringReader(responseString)));
 
-                                // process the response
-                                NodeList errorElements = document.getElementsByTagName("Error");
-                                if (errorElements.getLength() > 0) {
-                                    Node errorElement = errorElements.item(0);
-                                    errorElement.getChildNodes();
-                                }
-
+                                processUSPSResponseDocument(document);
                             }
-                        } catch (IOException io_ex) {
-                            Log.e(TAG, io_ex.toString());
-                        } catch (SAXException sax_ex) {
-
+                        } catch (IOException | SAXException ex) {
+                            Log.e(TAG, ex.toString());
                         }
                     }
                 }
@@ -190,6 +198,15 @@ public class StillInMemphisSyncAdapter extends AbstractThreadedSyncAdapter {
 
         // complete sync
         onSyncCompleted();
+    }
+
+    private void processUSPSResponseDocument(Document document) {
+        // process the response
+        NodeList errorElements = document.getElementsByTagName("Error");
+        if (errorElements.getLength() > 0) {
+            Node errorElement = errorElements.item(0);
+            errorElement.getChildNodes();
+        }
     }
 
     /**
