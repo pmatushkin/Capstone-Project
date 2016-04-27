@@ -172,7 +172,7 @@ public class TrackingContract {
         // Event order
         // The events are ordered by the USPS web service. This is the event number in this order.
         // Use it to sort the events when displaying them on the Details page.
-        public static final String COLUMN_EVENT_ORDER = "order";
+        public static final String COLUMN_EVENT_ORDER = "usps_order";
 
         // Event type
         // "detail" or "error"
