@@ -9,3 +9,4 @@ OkHttp 3.2.0
 
 ## Acknowledgements
 Information provided by [USPS](www.usps.com)
+Inspired by [Sunshine](https://github.com/udacity/Advanced_Android_Development/tree/7.05_Pretty_Wallpaper_Time)
