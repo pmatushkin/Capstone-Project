@@ -4,7 +4,7 @@
 
     <!-- SyncAdapter strings -->
     <string name="sync_account_type" translatable="false">stillinmemphis.catsonmars.net</string>
-    <string name="content_authority" translatable="false">net.catsonmars.android.stillinmemphis.sync.provider</string>
+    <string name="content_authority" translatable="false">net.catsonmars.android.stillinmemphis</string>
 
     <!--USPS Web Tools Track/Confirm Fields API url-->
     <string name="usps_scheme" translatable="false">http</string>
