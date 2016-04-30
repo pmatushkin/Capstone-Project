@@ -3,18 +3,23 @@ package net.catsonmars.android.stillinmemphis.sync;
 import android.accounts.Account;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SyncResult;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
 import net.catsonmars.android.stillinmemphis.BuildConfig;
 import net.catsonmars.android.stillinmemphis.R;
+import net.catsonmars.android.stillinmemphis.data.TrackingContract;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -24,6 +29,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -38,6 +47,8 @@ import javax.xml.transform.stream.StreamResult;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+
+import static net.catsonmars.android.stillinmemphis.XmlUtils.asList;
 
 /**
  * Created by pmatushkin on 4/21/2016.
@@ -57,6 +68,8 @@ public class StillInMemphisSyncAdapter extends AbstractThreadedSyncAdapter {
     // A maximum quantity of tracking numbers in a single request is 10
     private static final int MAX_TRACKING_NUMBERS_COUNT = 10;
 
+    private Date mErrorTimestamp;
+
     public StillInMemphisSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
 
@@ -68,22 +81,6 @@ public class StillInMemphisSyncAdapter extends AbstractThreadedSyncAdapter {
 
         Log.d(TAG, "StillInMemphisSyncAdapter.StillInMemphisSyncAdapter( , , )");
     }
-
-//    @Override
-//    public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
-//        String dateValue = "February 23, 2016";
-//        String timeValue = "11:32 am";
-//
-//        long normalizedDate = TrackingContract.normalizeDate(dateValue, timeValue);
-//
-//        Date date = new Date(normalizedDate);
-//        SimpleDateFormat sdf = new SimpleDateFormat(TrackingContract.FORMAT_DATE_TIME, Locale.US);
-//        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-//
-//        Log.d(TAG, sdf.format(date));
-//        // complete sync
-//        onSyncCompleted();
-//    }
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
@@ -183,12 +180,9 @@ public class StillInMemphisSyncAdapter extends AbstractThreadedSyncAdapter {
                                 String responseString = response.body().string();
                                 Log.d(TAG, responseString);
 
-                                // parse the response
-                                document = documentBuilder.parse(new InputSource(new StringReader(responseString)));
-
-                                processUSPSResponseDocument(document);
+                                processUSPSResponseString(responseString);
                             }
-                        } catch (IOException | SAXException ex) {
+                        } catch (IOException ex) {
                             Log.e(TAG, ex.toString());
                         }
                     }
@@ -200,13 +194,309 @@ public class StillInMemphisSyncAdapter extends AbstractThreadedSyncAdapter {
         onSyncCompleted();
     }
 
+    public void processUSPSResponseString(String responseString) {
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder documentBuilder = null;
+        try {
+            documentBuilder = documentBuilderFactory.newDocumentBuilder();
+        } catch (ParserConfigurationException pcfg_ex) {
+            Log.e(TAG, pcfg_ex.toString());
+        }
+
+        if (documentBuilder != null) {
+            try {
+                // parse the response
+                Document document = documentBuilder.parse(new InputSource(new StringReader(responseString)));
+
+                // For error events, always use the smallest Date value to display them at the bottom of the list.
+                // So we initialize it here, before any processing takes place.
+                mErrorTimestamp = new Date();
+
+                processUSPSResponseDocument(document);
+            } catch (IOException | SAXException ex) {
+                Log.e(TAG, ex.toString());
+            }
+        }
+    }
+
     private void processUSPSResponseDocument(Document document) {
         // process the response
-        NodeList errorElements = document.getElementsByTagName("Error");
-        if (errorElements.getLength() > 0) {
-            Node errorElement = errorElements.item(0);
-            errorElement.getChildNodes();
+        NodeList trackInfoElements = document.getElementsByTagName("TrackInfo");
+        if (0 == trackInfoElements.getLength()) {
+            // exit
+            // for some reason the response doesn't have any data nodes
+        } else {
+            for (Node trackInfoElement : asList(trackInfoElements)) {
+                processTrackInfoElement(trackInfoElement);
+            }
         }
+    }
+
+    private void processTrackInfoElement(Node trackInfoElement) {
+        NamedNodeMap trackInfoAttributes = trackInfoElement.getAttributes();
+
+        Node idAttributeNode = trackInfoAttributes.getNamedItem("ID");
+        if (null == idAttributeNode) {
+            // exit
+            // for some reason this TrackInfo element doesn't have a package tracking number
+        } else {
+            String trackingNumber = idAttributeNode.getNodeValue();
+            Log.d(TAG, "tracking number " + trackingNumber);
+
+            long packageId = addPackage(trackingNumber);
+
+            NodeList trackDetailElements = trackInfoElement.getChildNodes();
+            Log.d(TAG, "found " + trackDetailElements.getLength() + " track detail elements");
+
+            int trackDetailElementsCount = trackDetailElements.getLength();
+
+            if (0 == trackDetailElementsCount) {
+                // exit
+                // for some reason the TrackInfo element doesn't have any detail nodes
+            } else {
+                int trackDetailElementIndex = 0;
+
+                while (trackDetailElementIndex < trackDetailElementsCount) {
+                    Node trackDetailElement = trackDetailElements.item(trackDetailElementIndex);
+
+                    if (trackDetailElement.getNodeType() == Node.ELEMENT_NODE) {
+
+                        NodeList eventElements = trackDetailElement.getChildNodes();
+
+                        if (0 == eventElements.getLength()) {
+                            // exit
+                            // for some reason the event element doesn't have any detail nodes
+                        } else {
+                            String trackDetailType = ((Element) trackDetailElement).getTagName();
+
+                            if ("Error".equals(trackDetailType)) {
+                                Log.d(TAG, trackDetailType + " is an error event");
+
+                                processErrorEvent(packageId, eventElements);
+                            } else {
+                                Log.d(TAG, trackDetailType + " is a regular event");
+
+                                processRegularEvent(packageId, trackDetailElementIndex, eventElements);
+                            }
+                        }
+                    }
+
+                    trackDetailElementIndex++;
+                }
+            }
+        }
+    }
+
+    private void processErrorEvent(long packageId, NodeList eventElements) {
+        Log.d(TAG, "StillInMemphisSyncAdapter.processErrorEvent()");
+
+        String description = null;
+
+        for (Node eventElement : asList(eventElements)) {
+            if ((eventElement.getNodeType() == Node.ELEMENT_NODE)
+                && "Description".equals(((Element) eventElement).getTagName() )) {
+
+                description = eventElement.getTextContent();
+            }
+        }
+
+        if (null != description)
+            addErrorEvent(packageId, description);
+    }
+
+    private void processRegularEvent(long packageId, int trackDetailElementIndex, NodeList eventElements) {
+        Log.d(TAG, "StillInMemphisSyncAdapter.processRegularEvent()");
+
+        String time = null;
+        String date = null;
+        String description = null;
+        String city = null;
+        String state = null;
+        String zip = null;
+        String country = null;
+
+        Log.d(TAG, "index: " + trackDetailElementIndex);
+
+        for (Node eventElement : asList(eventElements)) {
+            if (eventElement.getNodeType() == Node.ELEMENT_NODE) {
+                String tagName = ((Element) eventElement).getTagName();
+                String textContent = eventElement.getTextContent();
+
+                if ("EventTime".equals(tagName)) {
+                    Log.d(TAG, "time: " + textContent);
+                    time = textContent;
+                } else if ("EventDate".equals(tagName)) {
+                    Log.d(TAG, "date: " + textContent);
+                    date = textContent;
+                } else if ("Event".equals(tagName)) {
+                    Log.d(TAG, "description: " + textContent);
+                    description = textContent;
+                } else if ("EventCity".equals(tagName)) {
+                    Log.d(TAG, "city: " + textContent);
+                    city = textContent;
+                } else if ("EventState".equals(tagName)) {
+                    Log.d(TAG, "state: " + textContent);
+                    state = textContent;
+                } else if ("EventZIPCode".equals(tagName)) {
+                    Log.d(TAG, "zip: " + textContent);
+                    zip = textContent;
+                } else if ("EventCountry".equals(tagName)) {
+                    Log.d(TAG, "country: " + textContent);
+                    country = textContent;
+                }
+            }
+        }
+
+        if (null != description)
+            addRegularEvent(packageId,
+                    trackDetailElementIndex,
+                    time,
+                    date,
+                    description,
+                    city,
+                    state,
+                    zip,
+                    country);
+    }
+
+    private long addPackage(String trackingNumber) {
+        Log.d(TAG, "StillInMemphisSyncAdapter.addPackage()");
+
+        long packageId;
+
+        // First, check if the package with this tracking number exists in the db
+        Cursor packageCursor = getContext().getContentResolver().query(
+                TrackingContract.PackagesEntry.CONTENT_URI,
+                new String[] { TrackingContract.PackagesEntry._ID },
+                TrackingContract.PackagesEntry.COLUMN_TRACKING_NUMBER + " = ?",
+                new String[] { trackingNumber },
+                null);
+
+        if (packageCursor.moveToFirst()) {
+            Log.d(TAG, "tracking number " + trackingNumber + " is found in the table");
+
+            int packageIdIndex = packageCursor.getColumnIndex(TrackingContract.PackagesEntry._ID);
+            packageId = packageCursor.getLong(packageIdIndex);
+
+            deleteAllEvents(packageId);
+        } else {
+            Log.d(TAG, "tracking number " + trackingNumber + " is NOT found in the table");
+
+            ContentValues packageValues = new ContentValues();
+
+            Date currentDate = new Date();
+
+            packageValues.put(TrackingContract.PackagesEntry.COLUMN_TRACKING_NUMBER, trackingNumber);
+            packageValues.put(TrackingContract.PackagesEntry.COLUMN_ARCHIVED, 0);
+            packageValues.put(TrackingContract.PackagesEntry.COLUMN_DATE_ADDED, currentDate.getTime());
+
+            // Finally, insert location data into the database.
+            Uri insertedUri = getContext().getContentResolver().insert(
+                    TrackingContract.PackagesEntry.CONTENT_URI,
+                    packageValues
+            );
+
+            // The resulting URI contains the ID for the row.  Extract the locationId from the Uri.
+            packageId = ContentUris.parseId(insertedUri);
+        }
+
+        Log.d(TAG, "package id: " + packageId);
+
+        packageCursor.close();
+
+        return packageId;
+    }
+
+    private void deleteAllEvents(long packageId) {
+        // Delete the previously inserted events for the package
+        int deletedEvents = getContext().getContentResolver().delete(
+                TrackingContract.EventsEntry.CONTENT_URI,
+                TrackingContract.EventsEntry.COLUMN_PACKAGE_ID + " = ?",
+                new String[] { String.valueOf(packageId) }
+        );
+
+        Log.d(TAG, "deleted events: " + deletedEvents);
+    }
+
+    private void addErrorEvent(long packageId, String description) {
+        Log.d(TAG, "StillInMemphisSyncAdapter.addErrorEvent()");
+
+        long eventId;
+
+        ContentValues eventValues = new ContentValues();
+
+        eventValues.put(TrackingContract.EventsEntry.COLUMN_PACKAGE_ID, packageId);
+        // event order is always 0 for the error event (there are no other events)
+        eventValues.put(TrackingContract.EventsEntry.COLUMN_EVENT_ORDER, 0);
+        eventValues.put(TrackingContract.EventsEntry.COLUMN_TYPE, "error");
+        eventValues.put(TrackingContract.EventsEntry.COLUMN_TIMESTAMP, mErrorTimestamp.getTime());
+        eventValues.put(TrackingContract.EventsEntry.COLUMN_EVENT, description);
+
+        // Finally, insert location data into the database.
+        Uri insertedUri = getContext().getContentResolver().insert(
+                TrackingContract.EventsEntry.CONTENT_URI,
+                eventValues
+        );
+
+        // The resulting URI contains the ID for the row.  Extract the locationId from the Uri.
+        eventId = ContentUris.parseId(insertedUri);
+
+        Log.d(TAG, "error event id: " + eventId);
+        Log.d(TAG, "error description: " + description);
+    }
+
+    private void addRegularEvent(long packageId,
+                                 int eventOrder,
+                                 String time,
+                                 String date,
+                                 String description,
+                                 String city,
+                                 String state,
+                                 String zip,
+                                 String country) {
+        Log.d(TAG, "StillInMemphisSyncAdapter.addRegularEvent()");
+
+        long eventId;
+
+        long normalizedDate = TrackingContract.normalizeDate(date, time);
+
+        ContentValues eventValues = new ContentValues();
+
+        eventValues.put(TrackingContract.EventsEntry.COLUMN_PACKAGE_ID, packageId);
+        eventValues.put(TrackingContract.EventsEntry.COLUMN_EVENT_ORDER, eventOrder);
+        eventValues.put(TrackingContract.EventsEntry.COLUMN_TYPE, "event");
+        eventValues.put(TrackingContract.EventsEntry.COLUMN_TIMESTAMP, normalizedDate);
+        if (null != time)
+            eventValues.put(TrackingContract.EventsEntry.COLUMN_TIME, time);
+        if (null != date)
+            eventValues.put(TrackingContract.EventsEntry.COLUMN_DATE, date);
+        eventValues.put(TrackingContract.EventsEntry.COLUMN_EVENT, description);
+        if (null != city)
+            eventValues.put(TrackingContract.EventsEntry.COLUMN_CITY, city);
+        if (null != state)
+            eventValues.put(TrackingContract.EventsEntry.COLUMN_STATE, state);
+        if (null != zip)
+            eventValues.put(TrackingContract.EventsEntry.COLUMN_ZIP, zip);
+        if (null != country)
+            eventValues.put(TrackingContract.EventsEntry.COLUMN_COUNTRY, country);
+
+        // Finally, insert location data into the database.
+        Uri insertedUri = getContext().getContentResolver().insert(
+                TrackingContract.EventsEntry.CONTENT_URI,
+                eventValues
+        );
+
+        // The resulting URI contains the ID for the row.  Extract the locationId from the Uri.
+        eventId = ContentUris.parseId(insertedUri);
+
+        Date d = new Date(normalizedDate);
+        SimpleDateFormat sdf = new SimpleDateFormat(TrackingContract.FORMAT_DATE_TIME, Locale.US);
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+
+        Log.d(TAG, "event id   : " + eventId);
+        Log.d(TAG, "description: " + description);
+        Log.d(TAG, "date + time: " + date + " " + time);
+        Log.d(TAG, "normalized : " + sdf.format(d));
     }
 
     /**
