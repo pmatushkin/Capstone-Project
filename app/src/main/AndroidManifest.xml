@@ -49,7 +49,7 @@
         </service>
 
         <!--Content provider-->
-        <provider android:name=".sync.StillInMemphisContentProvider"
+        <provider android:name=".data.TrackingProvider"
             android:authorities="@string/content_authority"
             android:exported="false"
             android:syncable="true">
