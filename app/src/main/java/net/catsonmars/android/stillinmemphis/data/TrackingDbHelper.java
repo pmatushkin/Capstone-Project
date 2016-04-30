@@ -33,10 +33,12 @@ public class TrackingDbHelper extends SQLiteOpenHelper {
         final String SQL_CREATE_PACKAGES_TABLE = "CREATE TABLE " + PackagesEntry.TABLE_NAME + " (" +
                 PackagesEntry._ID + " INTEGER PRIMARY KEY," +
                 PackagesEntry.COLUMN_TRACKING_NUMBER + " TEXT UNIQUE NOT NULL, " +
-                PackagesEntry.COLUMN_DESCRIPTION + " TEXT NOT NULL, " +
+                // package description is optional
+                PackagesEntry.COLUMN_DESCRIPTION + " TEXT, " +
                 PackagesEntry.COLUMN_ARCHIVED + " INTEGER NOT NULL, " +
                 PackagesEntry.COLUMN_DATE_ADDED + " INTEGER NOT NULL, " +
-                PackagesEntry.COLUMN_DATE_DELIVERED + " INTEGER NOT NULL " +
+                // delivery date is optional
+                PackagesEntry.COLUMN_DATE_DELIVERED + " INTEGER " +
                 " );";
         Log.d(TAG, SQL_CREATE_PACKAGES_TABLE);
 
@@ -46,14 +48,16 @@ public class TrackingDbHelper extends SQLiteOpenHelper {
                 EventsEntry.COLUMN_EVENT_ORDER + " INTEGER NOT NULL, " +
                 EventsEntry.COLUMN_TYPE + " TEXT NOT NULL, " +
                 EventsEntry.COLUMN_TIMESTAMP + " INTEGER NOT NULL," +
-                EventsEntry.COLUMN_TIME + " TEXT NOT NULL, " +
-                EventsEntry.COLUMN_DATE + " TEXT NOT NULL, " +
+                // time and date fields are not in the error response
+                EventsEntry.COLUMN_TIME + " TEXT, " +
+                EventsEntry.COLUMN_DATE + " TEXT, " +
 
                 EventsEntry.COLUMN_EVENT + " TEXT NOT NULL, " +
-                EventsEntry.COLUMN_CITY + " TEXT NOT NULL, " +
-                EventsEntry.COLUMN_STATE + " TEXT NOT NULL, " +
-                EventsEntry.COLUMN_ZIP + " TEXT NOT NULL, " +
-                EventsEntry.COLUMN_COUNTRY + " TEXT NOT NULL, " +
+                // address fields look to be optional
+                EventsEntry.COLUMN_CITY + " TEXT, " +
+                EventsEntry.COLUMN_STATE + " TEXT, " +
+                EventsEntry.COLUMN_ZIP + " TEXT, " +
+                EventsEntry.COLUMN_COUNTRY + " TEXT, " +
 
                 // Set up the COLUMN_PACKAGE_ID column as a foreign key to Packages table.
                 " FOREIGN KEY (" + EventsEntry.COLUMN_PACKAGE_ID + ") REFERENCES " +

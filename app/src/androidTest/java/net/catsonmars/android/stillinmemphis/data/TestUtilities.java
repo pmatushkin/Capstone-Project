@@ -14,7 +14,7 @@ import java.util.Set;
 public class TestUtilities extends AndroidTestCase {
     static final String TEST_PACKAGE = "9405803699300222655286";
 
-    static ContentValues createNorthPoleLocationValues() {
+    static ContentValues createPackageValues() {
         // Create a new map of values, where column names are the keys
         ContentValues testValues = new ContentValues();
 
@@ -25,6 +25,19 @@ public class TestUtilities extends AndroidTestCase {
         testValues.put(TrackingContract.PackagesEntry.COLUMN_ARCHIVED, 0);
         testValues.put(TrackingContract.PackagesEntry.COLUMN_DATE_ADDED, currentDate.getTime());
         testValues.put(TrackingContract.PackagesEntry.COLUMN_DATE_DELIVERED, currentDate.getTime());
+
+        return testValues;
+    }
+
+    static ContentValues createIncompletePackageValues() {
+        // Create a new map of values, where column names are the keys
+        ContentValues testValues = new ContentValues();
+
+        Date currentDate = new Date();
+
+        testValues.put(TrackingContract.PackagesEntry.COLUMN_TRACKING_NUMBER, TEST_PACKAGE);
+        testValues.put(TrackingContract.PackagesEntry.COLUMN_ARCHIVED, 0);
+        testValues.put(TrackingContract.PackagesEntry.COLUMN_DATE_ADDED, currentDate.getTime());
 
         return testValues;
     }
@@ -61,6 +74,20 @@ public class TestUtilities extends AndroidTestCase {
         testValues.put(TrackingContract.EventsEntry.COLUMN_STATE, "NY");
         testValues.put(TrackingContract.EventsEntry.COLUMN_ZIP, "11377");
         testValues.put(TrackingContract.EventsEntry.COLUMN_COUNTRY, "");
+
+        return testValues;
+    }
+
+    public static ContentValues createIncompleteEventValues(long packageRowId) {
+        ContentValues testValues = new ContentValues();
+
+        Date currentDate = new Date();
+
+        testValues.put(TrackingContract.EventsEntry.COLUMN_PACKAGE_ID, packageRowId);
+        testValues.put(TrackingContract.EventsEntry.COLUMN_EVENT_ORDER, 0);
+        testValues.put(TrackingContract.EventsEntry.COLUMN_TYPE, "event");
+        testValues.put(TrackingContract.EventsEntry.COLUMN_TIMESTAMP, currentDate.getTime());
+        testValues.put(TrackingContract.EventsEntry.COLUMN_EVENT, "Delivered");
 
         return testValues;
     }
