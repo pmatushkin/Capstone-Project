@@ -159,6 +159,7 @@ public class TrackingContract {
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_EVENTS;
 
+        // event type strings
         public static final String TYPE_EVENT = "event";
         public static final String TYPE_ERROR = "error";
 
