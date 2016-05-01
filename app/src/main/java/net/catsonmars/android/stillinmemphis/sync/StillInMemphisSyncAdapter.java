@@ -428,7 +428,7 @@ public class StillInMemphisSyncAdapter extends AbstractThreadedSyncAdapter {
         eventValues.put(TrackingContract.EventsEntry.COLUMN_PACKAGE_ID, packageId);
         // event order is always 0 for the error event (there are no other events)
         eventValues.put(TrackingContract.EventsEntry.COLUMN_EVENT_ORDER, 0);
-        eventValues.put(TrackingContract.EventsEntry.COLUMN_TYPE, "error");
+        eventValues.put(TrackingContract.EventsEntry.COLUMN_TYPE, TrackingContract.EventsEntry.TYPE_ERROR);
         eventValues.put(TrackingContract.EventsEntry.COLUMN_TIMESTAMP, mErrorTimestamp.getTime());
         eventValues.put(TrackingContract.EventsEntry.COLUMN_EVENT, description);
 
@@ -464,7 +464,7 @@ public class StillInMemphisSyncAdapter extends AbstractThreadedSyncAdapter {
 
         eventValues.put(TrackingContract.EventsEntry.COLUMN_PACKAGE_ID, packageId);
         eventValues.put(TrackingContract.EventsEntry.COLUMN_EVENT_ORDER, eventOrder);
-        eventValues.put(TrackingContract.EventsEntry.COLUMN_TYPE, "event");
+        eventValues.put(TrackingContract.EventsEntry.COLUMN_TYPE, TrackingContract.EventsEntry.TYPE_EVENT);
         eventValues.put(TrackingContract.EventsEntry.COLUMN_TIMESTAMP, normalizedDate);
         if (null != time)
             eventValues.put(TrackingContract.EventsEntry.COLUMN_TIME, time);
@@ -522,6 +522,7 @@ public class StillInMemphisSyncAdapter extends AbstractThreadedSyncAdapter {
      */
     private String[] getTrackingNumbersToSync(Bundle bundle)
     {
+        // TODO implement getTrackingNumbersToSync() for syncing a single tracking number
         Log.d(TAG, "StillInMemphisSyncAdapter.getTrackingNumbersToSync(Bundle)");
 
         if (bundle.containsKey(EXTRA_TRACKING_NNMBER)) {
@@ -536,6 +537,7 @@ public class StillInMemphisSyncAdapter extends AbstractThreadedSyncAdapter {
 
     private String[] getTrackingNumbersToSync()
     {
+        // TODO implement getTrackingNumbersToSync()
         Log.d(TAG, "StillInMemphisSyncAdapter.getTrackingNumbersToSync()");
         Log.d(TAG, "return the array of active tracking numbers from the database");
 
