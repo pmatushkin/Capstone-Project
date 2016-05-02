@@ -143,10 +143,34 @@ public class TrackingContract {
         // The package becomes delivered when TrackSummary.Event contains the word "delivered"
         public static final String COLUMN_DATE_DELIVERED = "date_delivered";
 
+        // a single package by id
+        // packages/#
         public static Uri buildPackageUri(long id) {
             Log.d(TAG, "PackagesEntry.buildPackageUri()");
 
             return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        // a single package by id with all events
+        // packages/#/*
+        public static Uri buildPackageWithEventsUri(long id) {
+            Log.d(TAG, "PackagesEntry.buildPackageWithEventsUri()");
+
+            return ContentUris.withAppendedId(CONTENT_URI, id).buildUpon().appendPath("*").build();
+        }
+
+        // all packages with the latest event
+        // packages/*/0
+        public static Uri buildPackagesWithLatestEventUri() {
+            Log.d(TAG, "PackagesEntry.buildPackagesWithLatestEventUri()");
+
+            return CONTENT_URI.buildUpon().appendPath("*").appendPath("0").build();
+        }
+
+        public static String getPackageIdFromUri(Uri uri) {
+            Log.d(TAG, "PackagesEntry.getPackageIdFromUri()");
+
+            return uri.getPathSegments().get(1);
         }
     }
 
@@ -212,20 +236,12 @@ public class TrackingContract {
         // Use to display the event location.
         public static final String COLUMN_COUNTRY = "country";
 
+        // a single event by id
+        // events/#
         public static Uri buildEventUri(long id) {
             Log.d(TAG, "EventsEntry.buildEventUri()");
 
             return ContentUris.withAppendedId(CONTENT_URI, id);
-        }
-
-        public static Uri buildEventPackage(long packageId) {
-            return CONTENT_URI.buildUpon().appendPath(String.valueOf(packageId)).build();
-        }
-
-        public static String getPackageIdFromUri(Uri uri) {
-            Log.d(TAG, "EventsEntry.getPackageIdFromUri()");
-
-            return uri.getPathSegments().get(1);
         }
     }
 }

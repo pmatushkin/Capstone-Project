@@ -21,7 +21,8 @@ public class TrackingProvider extends ContentProvider {
     private TrackingDbHelper mOpenHelper;
 
     static final int PACKAGES = 100;
-    static final int PACKAGES_WITH_EVENTS = 101;
+    static final int PACKAGE_WITH_EVENTS = 101;
+    static final int PACKAGES_WITH_LATEST_EVENT = 102;
     static final int EVENTS = 200;
 
     private static final SQLiteQueryBuilder sEventsByPackageQueryBuilder;
@@ -41,16 +42,18 @@ public class TrackingProvider extends ContentProvider {
         final String authority = TrackingContract.CONTENT_AUTHORITY;
 
         matcher.addURI(authority, TrackingContract.PATH_PACKAGES, PACKAGES);
-        matcher.addURI(authority, TrackingContract.PATH_EVENTS + "/*", PACKAGES_WITH_EVENTS);
+        matcher.addURI(authority, TrackingContract.PATH_PACKAGES + "/#/*", PACKAGE_WITH_EVENTS);
+        matcher.addURI(authority, TrackingContract.PATH_PACKAGES + "/*/0", PACKAGES_WITH_LATEST_EVENT);
 
         matcher.addURI(authority, TrackingContract.PATH_EVENTS, EVENTS);
+
         return matcher;
     }
 
     private Cursor getEventsForPackage(Uri uri, String[] projection, String sortOrder) {
         Log.d(TAG, "TrackingProvider.getEventsForPackage()");
 
-        String packageId = TrackingContract.EventsEntry.getPackageIdFromUri(uri);
+        String packageId = TrackingContract.PackagesEntry.getPackageIdFromUri(uri);
 
         //packages._ID = ?
         String selection = TrackingContract.PackagesEntry.TABLE_NAME
@@ -63,6 +66,25 @@ public class TrackingProvider extends ContentProvider {
                 projection,
                 selection,
                 selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+    }
+
+    private Cursor getLatestEventForPackages(String[] projection, String sortOrder) {
+        Log.d(TAG, "TrackingProvider.getLatestEventForPackages()");
+
+        // only active packages, only events where order==0
+        // ((archived = 0) AND (usps_order = 0))
+        String selection = "((" + TrackingContract.PackagesEntry.COLUMN_ARCHIVED + " = 0) AND ("
+                + TrackingContract.EventsEntry.COLUMN_EVENT_ORDER + " = 0))";
+        Log.d(TAG, selection);
+
+        return sEventsByPackageQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+                projection,
+                selection,
+                null,
                 null,
                 null,
                 sortOrder
@@ -111,8 +133,10 @@ public class TrackingProvider extends ContentProvider {
         switch (match) {
             case PACKAGES:
                 return TrackingContract.PackagesEntry.CONTENT_TYPE;
-            case PACKAGES_WITH_EVENTS:
-                return TrackingContract.EventsEntry.CONTENT_TYPE;
+            case PACKAGE_WITH_EVENTS:
+                return TrackingContract.PackagesEntry.CONTENT_ITEM_TYPE;
+            case PACKAGES_WITH_LATEST_EVENT:
+                return TrackingContract.PackagesEntry.CONTENT_TYPE;
             case EVENTS:
                 return TrackingContract.EventsEntry.CONTENT_TYPE;
             default:
@@ -143,10 +167,20 @@ public class TrackingProvider extends ContentProvider {
                         null,
                         sortOrder
                 );
+                retCursor.setNotificationUri(getContext().getContentResolver(), uri);
+
                 break;
             }
-            case PACKAGES_WITH_EVENTS: {
+            case PACKAGE_WITH_EVENTS: {
                 retCursor = getEventsForPackage(uri, projection, sortOrder);
+                retCursor.setNotificationUri(getContext().getContentResolver(), TrackingContract.BASE_CONTENT_URI);
+
+                break;
+            }
+            case PACKAGES_WITH_LATEST_EVENT: {
+                retCursor = getLatestEventForPackages(projection, sortOrder);
+                retCursor.setNotificationUri(getContext().getContentResolver(), TrackingContract.BASE_CONTENT_URI);
+
                 break;
             }
             case EVENTS: {
@@ -159,14 +193,14 @@ public class TrackingProvider extends ContentProvider {
                         null,
                         sortOrder
                 );
+                retCursor.setNotificationUri(getContext().getContentResolver(), uri);
+
                 break;
             }
 
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-
-        retCursor.setNotificationUri(getContext().getContentResolver(), uri);
 
         Log.d(TAG, "Returning records: " + Integer.toString(retCursor.getCount()));
         return retCursor;
