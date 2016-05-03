@@ -173,13 +173,15 @@ public class TrackingProvider extends ContentProvider {
             }
             case PACKAGE_WITH_EVENTS: {
                 retCursor = getEventsForPackage(uri, projection, sortOrder);
-                retCursor.setNotificationUri(getContext().getContentResolver(), TrackingContract.BASE_CONTENT_URI);
+                retCursor.setNotificationUri(getContext().getContentResolver(),
+                        TrackingContract.BASE_CONTENT_URI);
 
                 break;
             }
             case PACKAGES_WITH_LATEST_EVENT: {
                 retCursor = getLatestEventForPackages(projection, sortOrder);
-                retCursor.setNotificationUri(getContext().getContentResolver(), TrackingContract.BASE_CONTENT_URI);
+                retCursor.setNotificationUri(getContext().getContentResolver(),
+                        TrackingContract.BASE_CONTENT_URI);
 
                 break;
             }
