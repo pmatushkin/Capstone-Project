@@ -4,19 +4,25 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import net.catsonmars.android.stillinmemphis.data.TrackingContract;
 import net.catsonmars.android.stillinmemphis.dummy.DummyContent;
 import net.catsonmars.android.stillinmemphis.sync.StillInMemphisSyncAdapter;
 import net.catsonmars.android.stillinmemphis.sync.StillInMemphisSyncService;
@@ -31,14 +37,36 @@ import java.util.List;
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class TrackingNumberListActivity extends AppCompatActivity {
+public class TrackingNumberListActivity
+        extends AppCompatActivity
+        implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String TAG = "NumberListActivity";
 
-    /**
-     * Whether or not the activity is in two-pane mode, i.e. running on a tablet
-     * device.
-     */
     private boolean mTwoPane;
+
+    private boolean mIsRefreshing = false;
+
+    private static final int PACKAGES_LOADER = 0;
+    private static final String[] PACKAGES_COLUMNS = {
+            // these two columns are for displaying the package description
+            TrackingContract.PackagesEntry.COLUMN_TRACKING_NUMBER,
+            TrackingContract.PackagesEntry.COLUMN_DESCRIPTION,
+            // this column is for sorting by Newest First
+            TrackingContract.EventsEntry.COLUMN_TIMESTAMP,
+            // these three columns are for displaying the event details
+            TrackingContract.EventsEntry.COLUMN_TIME,
+            TrackingContract.EventsEntry.COLUMN_DATE,
+            TrackingContract.EventsEntry.COLUMN_EVENT
+    };
+
+    // These indices are tied to FORECAST_COLUMNS.  If FORECAST_COLUMNS changes, these
+    // must change.
+    static final int COL_PACKAGE_TRACKING_NUMBER = 0;
+    static final int COL_PACKAGE_DESCRIPTION = 1;
+    static final int COL_EVENT_TIMESTAMP = 2;
+    static final int COL_EVENT_TIME = 3;
+    static final int COL_EVENT_DATE = 4;
+    static final int COL_EVENT_DESCRIPTION = 5;
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private View mRecyclerView;
@@ -46,21 +74,32 @@ public class TrackingNumberListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate");
+
         setContentView(R.layout.activity_trackingnumber_list);
 
+        // set up toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setTitle(getTitle());
+        if (toolbar != null) {
+            toolbar.setTitle(getTitle());
+        }
 
+        // set up FAB
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        if (fab != null) {
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.d(TAG, "FloatingActionButton.onClick");
 
+                    Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                }
+            });
+        }
+
+        // set up SwipeRefreshLayout
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -69,10 +108,12 @@ public class TrackingNumberListActivity extends AppCompatActivity {
             }
         });
 
+        // set up RecyclerView
         mRecyclerView = findViewById(R.id.trackingnumber_list);
         assert mRecyclerView != null;
         setupRecyclerView((RecyclerView) mRecyclerView);
 
+        // set up two pane mode
         if (findViewById(R.id.trackingnumber_detail_container) != null) {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-w900dp).
@@ -81,7 +122,11 @@ public class TrackingNumberListActivity extends AppCompatActivity {
             mTwoPane = true;
         }
 
+        // initialize sync adapter
         StillInMemphisSyncService.initializeSyncAdapter(this);
+
+        // Prepare the loader
+        getSupportLoaderManager().initLoader(PACKAGES_LOADER, null, this);
     }
 
     /**
@@ -92,6 +137,8 @@ public class TrackingNumberListActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+        Log.d(TAG, "onStart");
+
         IntentFilter intentFilter = new IntentFilter(StillInMemphisSyncAdapter.BROADCAST_ACTION_DATA_CHANGE);
         intentFilter.addAction(StillInMemphisSyncAdapter.BROADCAST_ACTION_STATE_CHANGE);
 
@@ -100,28 +147,65 @@ public class TrackingNumberListActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
+        Log.d(TAG, "onStop");
+
         unregisterReceiver(mRefreshingReceiver);
 
         super.onStop();
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Log.d(TAG, "onCreateLoader");
+
+        // TODO maybe consider the sorting preferences set by user
+        String sortOrder = TrackingContract.EventsEntry.COLUMN_TIMESTAMP + " DESC";
+
+        return new CursorLoader(this,
+                // all events
+                TrackingContract.PackagesEntry.buildPackagesWithLatestEventUri(),
+                PACKAGES_COLUMNS,
+                null,
+                null,
+                sortOrder);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        Log.d(TAG, "onLoaderReset");
+//        mForecastAdapter.swapCursor(null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        Log.d(TAG, "onLoadFinished");
+
+        Log.d(TAG, "returned records: " + data.getCount());
+    }
+
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
+        Log.d(TAG, "setupRecyclerView");
+
         recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(DummyContent.ITEMS));
     }
 
     private void refresh() {
+        Log.d(TAG, "refresh");
+
         StillInMemphisSyncService.syncImmediately(this);
     }
 
-    private boolean mIsRefreshing = false;
-
     private void updateRefreshingUI() {
+        Log.d(TAG, "updateRefreshingUI");
+
         mSwipeRefreshLayout.setRefreshing(mIsRefreshing);
     }
 
     private BroadcastReceiver mRefreshingReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "mRefreshingReceiver.onReceive");
+
             if (StillInMemphisSyncAdapter.BROADCAST_ACTION_STATE_CHANGE.equals(intent.getAction())) {
                 mIsRefreshing = intent.getBooleanExtra(StillInMemphisSyncAdapter.EXTRA_REFRESHING, false);
                 updateRefreshingUI();
