@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import net.catsonmars.android.stillinmemphis.content.LatestEventsAdapter;
 import net.catsonmars.android.stillinmemphis.data.TrackingContract;
 import net.catsonmars.android.stillinmemphis.dummy.DummyContent;
 import net.catsonmars.android.stillinmemphis.sync.StillInMemphisSyncAdapter;
@@ -49,6 +50,7 @@ public class TrackingNumberListActivity
     private static final int PACKAGES_LOADER = 0;
     private static final String[] PACKAGES_COLUMNS = {
             // these two columns are for displaying the package description
+            TrackingContract.PackagesEntry.TABLE_NAME + "." + TrackingContract.PackagesEntry._ID,
             TrackingContract.PackagesEntry.COLUMN_TRACKING_NUMBER,
             TrackingContract.PackagesEntry.COLUMN_DESCRIPTION,
             // this column is for sorting by Newest First
@@ -59,16 +61,8 @@ public class TrackingNumberListActivity
             TrackingContract.EventsEntry.COLUMN_EVENT
     };
 
-    // These indices are tied to FORECAST_COLUMNS.  If FORECAST_COLUMNS changes, these
-    // must change.
-    static final int COL_PACKAGE_TRACKING_NUMBER = 0;
-    static final int COL_PACKAGE_DESCRIPTION = 1;
-    static final int COL_EVENT_TIMESTAMP = 2;
-    static final int COL_EVENT_TIME = 3;
-    static final int COL_EVENT_DATE = 4;
-    static final int COL_EVENT_DESCRIPTION = 5;
-
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private LatestEventsAdapter mLatestEventsAdapter;
     private View mRecyclerView;
 
     @Override
@@ -107,6 +101,8 @@ public class TrackingNumberListActivity
                 refresh();
             }
         });
+
+        mLatestEventsAdapter = new LatestEventsAdapter();
 
         // set up RecyclerView
         mRecyclerView = findViewById(R.id.trackingnumber_list);
@@ -173,7 +169,8 @@ public class TrackingNumberListActivity
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         Log.d(TAG, "onLoaderReset");
-//        mForecastAdapter.swapCursor(null);
+
+        mLatestEventsAdapter.swapCursor(null);
     }
 
     @Override
@@ -181,12 +178,15 @@ public class TrackingNumberListActivity
         Log.d(TAG, "onLoadFinished");
 
         Log.d(TAG, "returned records: " + data.getCount());
+
+        mLatestEventsAdapter.swapCursor(data);
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
         Log.d(TAG, "setupRecyclerView");
 
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(DummyContent.ITEMS));
+//        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(DummyContent.ITEMS));
+        recyclerView.setAdapter(mLatestEventsAdapter);
     }
 
     private void refresh() {
