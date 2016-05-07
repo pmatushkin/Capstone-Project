@@ -29,9 +29,6 @@ import net.catsonmars.android.stillinmemphis.sync.StillInMemphisSyncService;
 
 import java.util.List;
 
-//import net.catsonmars.android.stillinmemphis.content.LatestEventsAdapter;
-//import net.catsonmars.android.stillinmemphis.content.LatestEventsViewHolder;
-
 /**
  * An activity representing a list of Tracking Numbers. This activity
  * has different presentations for handset and tablet-size devices. On
@@ -51,8 +48,8 @@ public class TrackingNumberListActivity
 
     private static final int PACKAGES_LOADER = 0;
     private static final String[] PACKAGES_COLUMNS = {
-            // these two columns are for displaying the package description
             TrackingContract.PackagesEntry.TABLE_NAME + "." + TrackingContract.PackagesEntry._ID,
+            // these two columns are for displaying the package description
             TrackingContract.PackagesEntry.COLUMN_TRACKING_NUMBER,
             TrackingContract.PackagesEntry.COLUMN_DESCRIPTION,
             // this column is for sorting by Newest First
@@ -62,7 +59,7 @@ public class TrackingNumberListActivity
             TrackingContract.EventsEntry.COLUMN_DATE,
             TrackingContract.EventsEntry.COLUMN_EVENT
     };
-    // These indices are tied to TrackingNumberListActivity.PACKAGES_COLUMNS.
+    // These indices are tied to PACKAGES_COLUMNS.
     // If PACKAGES_COLUMNS changes, these must change.
     static final int COL_PACKAGE_ID = 0;
     static final int COL_PACKAGE_TRACKING_NUMBER = 1;
@@ -329,7 +326,7 @@ public class TrackingNumberListActivity
                 public void onClick(View v) {
                     if (mTwoPane) {
                         Bundle arguments = new Bundle();
-                        arguments.putString(TrackingNumberDetailFragment.ARG_ITEM_ID, holder.mPackageId);
+                        arguments.putString(TrackingNumberDetailFragment.ARG_PACKAGE_ID, holder.mPackageId);
                         TrackingNumberDetailFragment fragment = new TrackingNumberDetailFragment();
                         fragment.setArguments(arguments);
                         getSupportFragmentManager().beginTransaction()
@@ -338,7 +335,7 @@ public class TrackingNumberListActivity
                     } else {
                         Context context = v.getContext();
                         Intent intent = new Intent(context, TrackingNumberDetailActivity.class);
-                        intent.putExtra(TrackingNumberDetailFragment.ARG_ITEM_ID, holder.mPackageId);
+                        intent.putExtra(TrackingNumberDetailFragment.ARG_PACKAGE_ID, holder.mPackageId);
 
                         context.startActivity(intent);
                     }

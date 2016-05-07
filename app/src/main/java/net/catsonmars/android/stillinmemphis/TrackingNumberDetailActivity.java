@@ -53,8 +53,8 @@ public class TrackingNumberDetailActivity extends AppCompatActivity {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
             Bundle arguments = new Bundle();
-            arguments.putString(TrackingNumberDetailFragment.ARG_ITEM_ID,
-                    getIntent().getStringExtra(TrackingNumberDetailFragment.ARG_ITEM_ID));
+            arguments.putString(TrackingNumberDetailFragment.ARG_PACKAGE_ID,
+                    getIntent().getStringExtra(TrackingNumberDetailFragment.ARG_PACKAGE_ID));
             TrackingNumberDetailFragment fragment = new TrackingNumberDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
