@@ -128,7 +128,11 @@ public class TrackingNumberListActivity
         StillInMemphisSyncService.initializeSyncAdapter(this);
 
         // Prepare the loader
-        getSupportLoaderManager().initLoader(PACKAGES_LOADER, null, this);
+        if (getSupportLoaderManager().getLoader(PACKAGES_LOADER) == null) {
+            getSupportLoaderManager().initLoader(PACKAGES_LOADER, savedInstanceState, this);
+        } else {
+            getSupportLoaderManager().restartLoader(PACKAGES_LOADER, savedInstanceState, this);
+        }
     }
 
     /**
