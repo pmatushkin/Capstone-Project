@@ -22,13 +22,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import net.catsonmars.android.stillinmemphis.content.LatestEventsAdapter;
 import net.catsonmars.android.stillinmemphis.data.TrackingContract;
 import net.catsonmars.android.stillinmemphis.dummy.DummyContent;
 import net.catsonmars.android.stillinmemphis.sync.StillInMemphisSyncAdapter;
 import net.catsonmars.android.stillinmemphis.sync.StillInMemphisSyncService;
 
 import java.util.List;
+
+//import net.catsonmars.android.stillinmemphis.content.LatestEventsAdapter;
+//import net.catsonmars.android.stillinmemphis.content.LatestEventsViewHolder;
 
 /**
  * An activity representing a list of Tracking Numbers. This activity
@@ -60,6 +62,16 @@ public class TrackingNumberListActivity
             TrackingContract.EventsEntry.COLUMN_DATE,
             TrackingContract.EventsEntry.COLUMN_EVENT
     };
+    // These indices are tied to TrackingNumberListActivity.PACKAGES_COLUMNS.
+    // If PACKAGES_COLUMNS changes, these must change.
+    static final int COL_PACKAGE_ID = 0;
+    static final int COL_PACKAGE_TRACKING_NUMBER = 1;
+    static final int COL_PACKAGE_DESCRIPTION = 2;
+    static final int COL_EVENT_TIMESTAMP = 3;
+    static final int COL_EVENT_TIME = 4;
+    static final int COL_EVENT_DATE = 5;
+    static final int COL_EVENT_DESCRIPTION = 6;
+
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private LatestEventsAdapter mLatestEventsAdapter;
@@ -157,12 +169,13 @@ public class TrackingNumberListActivity
         // TODO maybe consider the sorting preferences set by user
         String sortOrder = TrackingContract.EventsEntry.COLUMN_TIMESTAMP + " DESC";
 
+        // TODO use selection and selection args to retrieve active or archived tracking numbers
         return new CursorLoader(this,
                 // all events
                 TrackingContract.PackagesEntry.buildPackagesWithLatestEventUri(),
                 PACKAGES_COLUMNS,
-                null,
-                null,
+                null, // selection
+                null, // selection args
                 sortOrder);
     }
 
@@ -273,6 +286,83 @@ public class TrackingNumberListActivity
                 mView = view;
                 mIdView = (TextView) view.findViewById(R.id.id);
                 mContentView = (TextView) view.findViewById(R.id.content);
+            }
+
+            @Override
+            public String toString() {
+                return super.toString() + " '" + mContentView.getText() + "'";
+            }
+        }
+    }
+
+    public class LatestEventsAdapter
+            extends RecyclerView.Adapter<LatestEventsAdapter.LatestEventsViewHolder> {
+
+        private Cursor mCursor;
+
+        @Override
+        public int getItemCount() {
+            return null == mCursor ?
+                    0
+                    :
+                    mCursor.getCount();
+        }
+
+        @Override
+        public LatestEventsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.trackingnumber_list_content, parent, false);
+
+            return new LatestEventsViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(final LatestEventsViewHolder holder, int position) {
+            mCursor.moveToPosition(position);
+
+            holder.mIdView.setText(Integer.toString(mCursor.getInt(COL_PACKAGE_ID)));
+            holder.mContentView.setText(mCursor.getString(COL_PACKAGE_TRACKING_NUMBER));
+            holder.mPackageId = mCursor.getString(COL_PACKAGE_ID);
+
+            holder.mView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mTwoPane) {
+                        Bundle arguments = new Bundle();
+                        arguments.putString(TrackingNumberDetailFragment.ARG_ITEM_ID, holder.mPackageId);
+                        TrackingNumberDetailFragment fragment = new TrackingNumberDetailFragment();
+                        fragment.setArguments(arguments);
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.trackingnumber_detail_container, fragment)
+                                .commit();
+                    } else {
+                        Context context = v.getContext();
+                        Intent intent = new Intent(context, TrackingNumberDetailActivity.class);
+                        intent.putExtra(TrackingNumberDetailFragment.ARG_ITEM_ID, holder.mPackageId);
+
+                        context.startActivity(intent);
+                    }
+                }
+            });
+        }
+
+        public void swapCursor(Cursor newCursor) {
+            mCursor = newCursor;
+            notifyDataSetChanged();
+        }
+
+        public class LatestEventsViewHolder extends RecyclerView.ViewHolder {
+            public final View mView;
+            public final TextView mIdView;
+            public final TextView mContentView;
+
+            public String mPackageId;
+
+            public LatestEventsViewHolder(View itemView) {
+                super(itemView);
+                mView = itemView;
+                mIdView = (TextView) itemView.findViewById(R.id.id);
+                mContentView = (TextView) itemView.findViewById(R.id.content);
             }
 
             @Override
