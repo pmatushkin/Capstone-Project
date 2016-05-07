@@ -1,9 +1,13 @@
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+<app:android.support.v7.widget.RecyclerView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/trackingnumber_detail"
-    style="?android:attr/textAppearanceLarge"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/trackingnumber_detail_list"
+    android:name="net.catsonmars.android.stillinmemphis.TrackingNumberDetailFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
-    android:textIsSelectable="true"
-    tools:context="net.catsonmars.android.stillinmemphis.TrackingNumberDetailFragment" />
+    android:layout_marginLeft="16dp"
+    android:layout_marginRight="16dp"
+    app:layoutManager="LinearLayoutManager"
+    tools:context="net.catsonmars.android.stillinmemphis.TrackingNumberDetailFragment"
+    tools:listitem="@layout/trackingnumber_list_content" />
