@@ -196,7 +196,6 @@ public class TrackingNumberListActivity
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
         Log.d(TAG, "setupRecyclerView");
 
-//        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(DummyContent.ITEMS));
         recyclerView.setAdapter(mLatestEventsAdapter);
     }
 

@@ -17,7 +17,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import net.catsonmars.android.stillinmemphis.data.TrackingContract;
-import net.catsonmars.android.stillinmemphis.dummy.DummyContent;
 
 /**
  * A fragment representing a single Tracking Number detail screen.
@@ -36,12 +35,9 @@ public class TrackingNumberDetailFragment
      */
     public static final String ARG_PACKAGE_ID = "package_id";
 
-    public static final String ARG_ITEM_ID = "item_id";
-
     /**
-     * The dummy content this fragment is presenting.
+     * The package id this fragment is presenting.
      */
-    private DummyContent.DummyItem mItem;
     private String mPackageId;
 
     private PackageEventsAdapter mPackageEventsAdapter;
@@ -93,17 +89,12 @@ public class TrackingNumberDetailFragment
         Log.d(TAG, "onCreate");
 
         if (getArguments().containsKey(ARG_PACKAGE_ID)) {
-            // Load the dummy content specified by the fragment
-            // arguments. In a real-world scenario, use a Loader
-            // to load content from a content provider.
-            mItem = DummyContent.ITEM_MAP.get(getArguments().getString(ARG_PACKAGE_ID));
-
             mPackageId = getArguments().getString(ARG_PACKAGE_ID);
 
             Activity activity = this.getActivity();
             CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
             if (appBarLayout != null) {
-                appBarLayout.setTitle(mItem.content);
+                appBarLayout.setTitle(mPackageId);
             }
         }
 
@@ -129,11 +120,6 @@ public class TrackingNumberDetailFragment
         assert mRecyclerView != null;
         setupRecyclerView((RecyclerView) mRecyclerView);
 
-//        // Show the dummy content as text in a TextView.
-//        if (mItem != null) {
-//            ((TextView) rootView.findViewById(R.id.trackingnumber_detail)).setText(mItem.details);
-//        }
-
         return rootView;
     }
 
@@ -147,6 +133,7 @@ public class TrackingNumberDetailFragment
                 EVENTS_COLUMNS,
                 null, // selection
                 null, // selection args
+                // sort the events from the mot recent to the most distant
                 TrackingContract.EventsEntry.COLUMN_EVENT_ORDER + " ASC");
     }
 
@@ -168,8 +155,6 @@ public class TrackingNumberDetailFragment
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
         Log.d(TAG, "setupRecyclerView");
-
-//        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(DummyContent.ITEMS));
 
         recyclerView.setAdapter(mPackageEventsAdapter);
     }
@@ -203,29 +188,6 @@ public class TrackingNumberDetailFragment
 
             holder.mIdView.setText(Integer.toString(mCursor.getInt(COL_EVENT_ORDER)));
             holder.mContentView.setText(mCursor.getString(COL_EVENT_DESCRIPTION));
-//            holder.mPackageId = mCursor.getString(COL_PACKAGE_ID);
-
-//            holder.mView.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    if (mTwoPane) {
-//                        Bundle arguments = new Bundle();
-//                        arguments.putString(TrackingNumberDetailFragment.ARG_PACKAGE_ID, holder.mPackageId);
-//                        TrackingNumberDetailFragment fragment = new TrackingNumberDetailFragment();
-//                        fragment.setArguments(arguments);
-//                        getSupportFragmentManager().beginTransaction()
-//                                .replace(R.id.trackingnumber_detail_container, fragment)
-//                                .commit();
-//                    } else {
-//                        Context context = v.getContext();
-//                        Intent intent = new Intent(context, TrackingNumberDetailActivity.class);
-//                        intent.putExtra(TrackingNumberDetailFragment.ARG_PACKAGE_ID, holder.mPackageId);
-//
-//                        context.startActivity(intent);
-//                    }
-//                }
-//            });
-
         }
 
         @Override
