@@ -1,6 +1,7 @@
 package net.catsonmars.android.stillinmemphis.content;
 
 import android.database.Cursor;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,6 +48,30 @@ public class LatestEventsAdapter extends RecyclerView.Adapter<LatestEventsViewHo
 
         holder.mIdView.setText(Integer.toString(mCursor.getInt(COL_PACKAGE_ID)));
         holder.mContentView.setText(mCursor.getString(COL_PACKAGE_TRACKING_NUMBER));
+
+        holder.mView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Snackbar.make(v, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+
+//                if (mTwoPane) {
+//                    Bundle arguments = new Bundle();
+//                    arguments.putString(TrackingNumberDetailFragment.ARG_ITEM_ID, holder.mItem.id);
+//                    TrackingNumberDetailFragment fragment = new TrackingNumberDetailFragment();
+//                    fragment.setArguments(arguments);
+//                    getSupportFragmentManager().beginTransaction()
+//                            .replace(R.id.trackingnumber_detail_container, fragment)
+//                            .commit();
+//                } else {
+//                    Context context = v.getContext();
+//                    Intent intent = new Intent(context, TrackingNumberDetailActivity.class);
+//                    intent.putExtra(TrackingNumberDetailFragment.ARG_ITEM_ID, holder.mItem.id);
+//
+//                    context.startActivity(intent);
+//                }
+            }
+        });
     }
 
     public void swapCursor(Cursor newCursor) {
