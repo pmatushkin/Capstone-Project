@@ -14,10 +14,27 @@ https://android.googlesource.com/platform/frameworks/base/+/kitkat-release/core/
     android:paddingRight="?android:attr/listPreferredItemPaddingRight"
     >
 
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="?android:attr/listPreferredItemHeight"
+        android:layout_height="?android:attr/listPreferredItemHeight"
+        android:paddingTop="8dip"
+        android:paddingBottom="8dip"
+        android:scaleType="fitCenter"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/package_regular"
+        android:contentDescription="@string/content_description_package_icon"
+        >
+    </ImageView>
+
     <TextView android:id="@+id/text1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/icon"
+        android:layout_toRightOf="@id/icon"
         android:layout_marginTop="8dip"
+        android:layout_marginStart="8dip"
+        android:layout_marginLeft="8dip"
         android:textAppearance="?android:attr/textAppearanceListItem"
         android:ellipsize="end"
         android:singleLine="true"
@@ -33,4 +50,5 @@ https://android.googlesource.com/platform/frameworks/base/+/kitkat-release/core/
         android:ellipsize="end"
         android:singleLine="true"
         />
+
 </RelativeLayout>

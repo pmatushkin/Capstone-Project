@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -20,6 +22,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import net.catsonmars.android.stillinmemphis.data.TrackingContract;
@@ -49,6 +52,9 @@ public class TrackingNumberListActivity
             // these two columns are for displaying the package description
             TrackingContract.PackagesEntry.COLUMN_TRACKING_NUMBER,
             TrackingContract.PackagesEntry.COLUMN_DESCRIPTION,
+            // these two columns are for selecting the right icon
+            TrackingContract.PackagesEntry.COLUMN_DATE_DELIVERED,
+            TrackingContract.PackagesEntry.COLUMN_ARCHIVED,
             // this column is for sorting by Newest First
             TrackingContract.EventsEntry.COLUMN_TIMESTAMP,
             // these three columns are for displaying the event details
@@ -62,11 +68,13 @@ public class TrackingNumberListActivity
     static final int COL_PACKAGE_ID = 0;
     static final int COL_PACKAGE_TRACKING_NUMBER = 1;
     static final int COL_PACKAGE_DESCRIPTION = 2;
-    static final int COL_EVENT_TIMESTAMP = 3;
-    static final int COL_EVENT_TYPE = 4;
-    static final int COL_EVENT_TIME = 5;
-    static final int COL_EVENT_DATE = 6;
-    static final int COL_EVENT_DESCRIPTION = 7;
+    static final int COL_PACKAGE_DATE_DELIVERED = 3;
+    static final int COL_PACKAGE_ARCHIVED = 4;
+    static final int COL_EVENT_TIMESTAMP = 5;
+    static final int COL_EVENT_TYPE = 6;
+    static final int COL_EVENT_TIME = 7;
+    static final int COL_EVENT_DATE = 8;
+    static final int COL_EVENT_DESCRIPTION = 9;
 
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -250,13 +258,17 @@ public class TrackingNumberListActivity
         public void onBindViewHolder(final LatestEventsViewHolder holder, int position) {
             mCursor.moveToPosition(position);
 
-            // get the package description string
+            // set the package id
+            holder.mPackageId = mCursor.getString(COL_PACKAGE_ID);
+
+            // set the package description string
             String packageDescriptionString = mCursor.getString(COL_PACKAGE_DESCRIPTION);
             if((null == packageDescriptionString) || packageDescriptionString.isEmpty()) {
                 packageDescriptionString = mCursor.getString(COL_PACKAGE_TRACKING_NUMBER);
             }
+            holder.mIdView.setText(packageDescriptionString);
 
-            // format the event description string
+            // set the event description string
             String eventDescriptionString;
             String eventType = mCursor.getString(COL_EVENT_TYPE);
             String eventDescription = mCursor.getString(COL_EVENT_DESCRIPTION);
@@ -268,12 +280,33 @@ public class TrackingNumberListActivity
             } else {
                 eventDescriptionString = eventDescription;
             }
-
-            holder.mIdView.setText(packageDescriptionString);
             holder.mContentView.setText(eventDescriptionString);
 
-            holder.mPackageId = mCursor.getString(COL_PACKAGE_ID);
+            // set the icon
+            Drawable icon;
+            int iconId;
+            int dateDelivered = mCursor.getInt(COL_PACKAGE_DATE_DELIVERED);
+            int packageArchived = mCursor.getInt(COL_PACKAGE_ARCHIVED);
+            // first check for the ARCHIVED flag
+            // all archived packages will have the same icon, regardless of the package status
+            if (packageArchived != 0) {
+                iconId = R.drawable.package_archived;
+            } else if (eventType.equals(TrackingContract.EventsEntry.TYPE_ERROR)) {
+                iconId = R.drawable.package_error;
+            } else if (dateDelivered != 0) {
+                iconId = R.drawable.package_delivered;
+            } else {
+                iconId = R.drawable.package_regular;
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                icon = getResources().getDrawable(iconId, getApplicationContext().getTheme());
+            } else {
+                icon = getResources().getDrawable(iconId);
+            }
+            holder.mIconView.setImageDrawable(icon);
+            holder.mIconView.setContentDescription("package " + packageDescriptionString);
 
+            // set the setOnClickListener
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -305,6 +338,7 @@ public class TrackingNumberListActivity
             public final View mView;
             public final TextView mIdView;
             public final TextView mContentView;
+            public final ImageView mIconView;
 
             public String mPackageId;
 
@@ -313,6 +347,7 @@ public class TrackingNumberListActivity
                 mView = itemView;
                 mIdView = (TextView) itemView.findViewById(R.id.text1);
                 mContentView = (TextView) itemView.findViewById(R.id.text2);
+                mIconView = (ImageView) itemView.findViewById(R.id.icon);
             }
 
             @Override
