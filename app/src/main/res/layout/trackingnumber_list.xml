@@ -17,7 +17,7 @@
         android:layout_marginRight="16dp"
         app:layoutManager="LinearLayoutManager"
         tools:context="net.catsonmars.android.stillinmemphis.TrackingNumberListActivity"
-        tools:listitem="@layout/trackingnumber_list_content" />
+        tools:listitem="@layout/latestevents_list_content" />
 
 </android.support.v4.widget.SwipeRefreshLayout>
 

@@ -52,6 +52,7 @@ public class TrackingNumberListActivity
             // this column is for sorting by Newest First
             TrackingContract.EventsEntry.COLUMN_TIMESTAMP,
             // these three columns are for displaying the event details
+            TrackingContract.EventsEntry.COLUMN_TYPE,
             TrackingContract.EventsEntry.COLUMN_TIME,
             TrackingContract.EventsEntry.COLUMN_DATE,
             TrackingContract.EventsEntry.COLUMN_EVENT
@@ -62,9 +63,10 @@ public class TrackingNumberListActivity
     static final int COL_PACKAGE_TRACKING_NUMBER = 1;
     static final int COL_PACKAGE_DESCRIPTION = 2;
     static final int COL_EVENT_TIMESTAMP = 3;
-    static final int COL_EVENT_TIME = 4;
-    static final int COL_EVENT_DATE = 5;
-    static final int COL_EVENT_DESCRIPTION = 6;
+    static final int COL_EVENT_TYPE = 4;
+    static final int COL_EVENT_TIME = 5;
+    static final int COL_EVENT_DATE = 6;
+    static final int COL_EVENT_DESCRIPTION = 7;
 
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -239,7 +241,7 @@ public class TrackingNumberListActivity
         @Override
         public LatestEventsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.trackingnumber_list_content, parent, false);
+                    .inflate(R.layout.latestevents_list_content, parent, false);
 
             return new LatestEventsViewHolder(view);
         }
@@ -248,8 +250,28 @@ public class TrackingNumberListActivity
         public void onBindViewHolder(final LatestEventsViewHolder holder, int position) {
             mCursor.moveToPosition(position);
 
-            holder.mIdView.setText(Integer.toString(mCursor.getInt(COL_PACKAGE_ID)));
-            holder.mContentView.setText(mCursor.getString(COL_PACKAGE_TRACKING_NUMBER));
+            // get the package description string
+            String packageDescriptionString = mCursor.getString(COL_PACKAGE_DESCRIPTION);
+            if((null == packageDescriptionString) || packageDescriptionString.isEmpty()) {
+                packageDescriptionString = mCursor.getString(COL_PACKAGE_TRACKING_NUMBER);
+            }
+
+            // format the event description string
+            String eventDescriptionString;
+            String eventType = mCursor.getString(COL_EVENT_TYPE);
+            String eventDescription = mCursor.getString(COL_EVENT_DESCRIPTION);
+            if (eventType.equals(TrackingContract.EventsEntry.TYPE_EVENT)) {
+                String eventDate = mCursor.getString(COL_EVENT_DATE);
+                String eventTime = mCursor.getString(COL_EVENT_TIME);
+
+                eventDescriptionString = String.format("%s, %s: %s", eventDate, eventTime, eventDescription);
+            } else {
+                eventDescriptionString = eventDescription;
+            }
+
+            holder.mIdView.setText(packageDescriptionString);
+            holder.mContentView.setText(eventDescriptionString);
+
             holder.mPackageId = mCursor.getString(COL_PACKAGE_ID);
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
@@ -289,8 +311,8 @@ public class TrackingNumberListActivity
             public LatestEventsViewHolder(View itemView) {
                 super(itemView);
                 mView = itemView;
-                mIdView = (TextView) itemView.findViewById(R.id.id);
-                mContentView = (TextView) itemView.findViewById(R.id.content);
+                mIdView = (TextView) itemView.findViewById(R.id.text1);
+                mContentView = (TextView) itemView.findViewById(R.id.text2);
             }
 
             @Override

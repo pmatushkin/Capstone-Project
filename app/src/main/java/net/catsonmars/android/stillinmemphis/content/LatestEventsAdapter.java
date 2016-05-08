@@ -37,7 +37,7 @@ public class LatestEventsAdapter extends RecyclerView.Adapter<LatestEventsViewHo
     @Override
     public LatestEventsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.trackingnumber_list_content, parent, false);
+                .inflate(R.layout.latestevents_list_content, parent, false);
 
         return new LatestEventsViewHolder(view);
     }
