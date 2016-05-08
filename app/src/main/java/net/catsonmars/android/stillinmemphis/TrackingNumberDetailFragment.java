@@ -1,6 +1,5 @@
 package net.catsonmars.android.stillinmemphis;
 
-import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -90,12 +89,6 @@ public class TrackingNumberDetailFragment
 
         if (getArguments().containsKey(ARG_PACKAGE_ID)) {
             mPackageId = getArguments().getString(ARG_PACKAGE_ID);
-
-            Activity activity = this.getActivity();
-            CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
-            if (appBarLayout != null) {
-                appBarLayout.setTitle(mPackageId);
-            }
         }
 
         mPackageEventsAdapter = new PackageEventsAdapter();
@@ -112,6 +105,11 @@ public class TrackingNumberDetailFragment
                              Bundle savedInstanceState) {
         // TODO fix onCreate by removing the references to the dummy object
         Log.d(TAG, "onCreateView");
+
+        CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) getActivity().findViewById(R.id.toolbar_layout);
+        if (appBarLayout != null) {
+            appBarLayout.setTitle(mPackageId);
+        }
 
         View rootView = inflater.inflate(R.layout.trackingnumber_detail, container, false);
 
@@ -172,7 +170,7 @@ public class TrackingNumberDetailFragment
 
         @Override
         public PackageEventsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            Log.d(TAG, "onCreateViewHolder");
+//            Log.d(TAG, "onCreateViewHolder");
 
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.trackingnumber_list_content, parent, false);
@@ -182,7 +180,7 @@ public class TrackingNumberDetailFragment
 
         @Override
         public void onBindViewHolder(PackageEventsViewHolder holder, int position) {
-            Log.d(TAG, "onBindViewHolder");
+//            Log.d(TAG, "onBindViewHolder");
 
             mCursor.moveToPosition(position);
 
@@ -192,7 +190,7 @@ public class TrackingNumberDetailFragment
 
         @Override
         public int getItemCount() {
-            Log.d(TAG, "getItemCount");
+//            Log.d(TAG, "getItemCount");
 
             return null == mCursor ?
                     0
