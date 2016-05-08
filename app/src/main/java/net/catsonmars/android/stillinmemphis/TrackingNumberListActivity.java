@@ -28,6 +28,7 @@ import android.widget.TextView;
 import net.catsonmars.android.stillinmemphis.data.TrackingContract;
 import net.catsonmars.android.stillinmemphis.sync.StillInMemphisSyncAdapter;
 import net.catsonmars.android.stillinmemphis.sync.StillInMemphisSyncService;
+import net.catsonmars.android.stillinmemphis.ui.DividerItemDecoration;
 
 /**
  * An activity representing a list of Tracking Numbers. This activity
@@ -75,7 +76,6 @@ public class TrackingNumberListActivity
     static final int COL_EVENT_TIME = 7;
     static final int COL_EVENT_DATE = 8;
     static final int COL_EVENT_DESCRIPTION = 9;
-
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private LatestEventsAdapter mLatestEventsAdapter;
@@ -206,6 +206,7 @@ public class TrackingNumberListActivity
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
         Log.d(TAG, "setupRecyclerView");
 
+        recyclerView.addItemDecoration(new DividerItemDecoration(this));
         recyclerView.setAdapter(mLatestEventsAdapter);
     }
 
