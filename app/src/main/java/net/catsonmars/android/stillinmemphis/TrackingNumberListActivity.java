@@ -6,12 +6,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -299,11 +299,7 @@ public class TrackingNumberListActivity
             } else {
                 iconId = R.drawable.package_regular;
             }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                icon = getResources().getDrawable(iconId, getApplicationContext().getTheme());
-            } else {
-                icon = getResources().getDrawable(iconId);
-            }
+            icon = ContextCompat.getDrawable(getApplicationContext(), iconId);
             holder.mIconView.setImageDrawable(icon);
             holder.mIconView.setContentDescription("package " + packageDescriptionString);
 
