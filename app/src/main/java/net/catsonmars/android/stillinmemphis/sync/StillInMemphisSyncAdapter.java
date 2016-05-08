@@ -511,7 +511,8 @@ public class StillInMemphisSyncAdapter extends AbstractThreadedSyncAdapter {
 
         String[] a = new String[2];
 
-        a[0] = "9405503699300270004035";
+//        a[0] = "9405503699300270004035";
+        a[0] = "9405803699300222655286";
         a[1] = "0";
 
 //        for (int i = 0; i < a.length; i++){
