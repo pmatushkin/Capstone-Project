@@ -333,6 +333,7 @@ public class TrackingNumberListActivity
 
         public class LatestEventsViewHolder extends RecyclerView.ViewHolder {
             public final View mView;
+            public final View mBackgroundView;
             public final TextView mIdView;
             public final TextView mContentView;
             public final ImageView mIconView;
@@ -342,6 +343,7 @@ public class TrackingNumberListActivity
             public LatestEventsViewHolder(View itemView) {
                 super(itemView);
                 mView = itemView;
+                mBackgroundView = itemView.findViewById(R.id.background_view);
                 mIdView = (TextView) itemView.findViewById(R.id.text1);
                 mContentView = (TextView) itemView.findViewById(R.id.text2);
                 mIconView = (ImageView) itemView.findViewById(R.id.icon);
