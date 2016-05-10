@@ -343,10 +343,10 @@ public class TrackingNumberListActivity
             public LatestEventsViewHolder(View itemView) {
                 super(itemView);
                 mView = itemView;
-                mBackgroundView = itemView.findViewById(R.id.background_view);
-                mIdView = (TextView) itemView.findViewById(R.id.text1);
-                mContentView = (TextView) itemView.findViewById(R.id.text2);
-                mIconView = (ImageView) itemView.findViewById(R.id.icon);
+                mBackgroundView = itemView.findViewById(R.id.latest_background_view);
+                mIdView = (TextView) itemView.findViewById(R.id.latest_text1);
+                mContentView = (TextView) itemView.findViewById(R.id.latest_text2);
+                mIconView = (ImageView) itemView.findViewById(R.id.latest_icon);
             }
 
             @Override

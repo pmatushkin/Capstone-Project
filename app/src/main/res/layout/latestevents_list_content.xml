@@ -4,7 +4,7 @@
 https://android.googlesource.com/platform/frameworks/base/+/kitkat-release/core/res/res/layout/simple_list_item_2.xml-->
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/background_view"
+    android:id="@+id/latest_background_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:minHeight="?android:attr/listPreferredItemHeight"
@@ -17,7 +17,7 @@ https://android.googlesource.com/platform/frameworks/base/+/kitkat-release/core/
     >
 
     <ImageView
-        android:id="@+id/icon"
+        android:id="@+id/latest_icon"
         android:layout_width="?android:attr/listPreferredItemHeight"
         android:layout_height="?android:attr/listPreferredItemHeight"
         android:paddingTop="8dip"
@@ -29,11 +29,11 @@ https://android.googlesource.com/platform/frameworks/base/+/kitkat-release/core/
         >
     </ImageView>
 
-    <TextView android:id="@+id/text1"
+    <TextView android:id="@+id/latest_text1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/icon"
-        android:layout_toRightOf="@id/icon"
+        android:layout_toEndOf="@id/latest_icon"
+        android:layout_toRightOf="@id/latest_icon"
         android:layout_marginTop="8dip"
         android:layout_marginStart="8dip"
         android:layout_marginLeft="8dip"
@@ -42,12 +42,12 @@ https://android.googlesource.com/platform/frameworks/base/+/kitkat-release/core/
         android:singleLine="true"
         />
 
-    <TextView android:id="@+id/text2"
+    <TextView android:id="@+id/latest_text2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/text1"
-        android:layout_alignStart="@id/text1"
-        android:layout_alignLeft="@id/text1"
+        android:layout_below="@id/latest_text1"
+        android:layout_alignStart="@id/latest_text1"
+        android:layout_alignLeft="@id/latest_text1"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:ellipsize="end"
         android:singleLine="true"
