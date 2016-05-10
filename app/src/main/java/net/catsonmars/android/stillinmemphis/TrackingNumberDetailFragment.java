@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import net.catsonmars.android.stillinmemphis.data.TrackingContract;
+import net.catsonmars.android.stillinmemphis.ui.DividerItemDecoration;
 
 /**
  * A fragment representing a single Tracking Number detail screen.
@@ -162,6 +163,7 @@ public class TrackingNumberDetailFragment
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
         Log.d(TAG, "setupRecyclerView");
 
+        recyclerView.addItemDecoration(new DividerItemDecoration(getContext()));
         recyclerView.setAdapter(mPackageEventsAdapter);
     }
 
