@@ -1,11 +1,13 @@
 package net.catsonmars.android.stillinmemphis;
 
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
@@ -13,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import net.catsonmars.android.stillinmemphis.data.TrackingContract;
@@ -47,6 +50,9 @@ public class TrackingNumberDetailFragment
             // these two columns are for displaying the package description
             TrackingContract.PackagesEntry.COLUMN_TRACKING_NUMBER,
             TrackingContract.PackagesEntry.COLUMN_DESCRIPTION,
+            // these two columns are for selecting the right icon
+            TrackingContract.PackagesEntry.COLUMN_DATE_DELIVERED,
+            TrackingContract.PackagesEntry.COLUMN_ARCHIVED,
             // this column is there for the debugging purposes
             TrackingContract.EventsEntry.COLUMN_EVENT_ORDER,
             // these columns are for displaying the event details
@@ -63,15 +69,17 @@ public class TrackingNumberDetailFragment
     // If EVENTS_COLUMNS changes, these must change.
     static final int COL_PACKAGE_TRACKING_NUMBER = 0;
     static final int COL_PACKAGE_DESCRIPTION = 1;
-    static final int COL_EVENT_ORDER = 2;
-    static final int COL_EVENT_TYPE = 3;
-    static final int COL_EVENT_TIME = 4;
-    static final int COL_EVENT_DATE = 5;
-    static final int COL_EVENT_DESCRIPTION = 6;
-    static final int COL_EVENT_CITY = 7;
-    static final int COL_EVENT_STATE = 8;
-    static final int COL_EVENT_ZIP = 9;
-    static final int COL_EVENT_COUNTRY = 10;
+    static final int COL_PACKAGE_DATE_DELIVERED = 2;
+    static final int COL_PACKAGE_ARCHIVED = 3;
+    static final int COL_EVENT_ORDER = 4;
+    static final int COL_EVENT_TYPE = 5;
+    static final int COL_EVENT_TIME = 6;
+    static final int COL_EVENT_DATE = 7;
+    static final int COL_EVENT_DESCRIPTION = 8;
+    static final int COL_EVENT_CITY = 9;
+    static final int COL_EVENT_STATE = 10;
+    static final int COL_EVENT_ZIP = 11;
+    static final int COL_EVENT_COUNTRY = 12;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -173,19 +181,89 @@ public class TrackingNumberDetailFragment
 //            Log.d(TAG, "onCreateViewHolder");
 
             View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.trackingnumber_list_content, parent, false);
+                    .inflate(R.layout.packageevents_list_content, parent, false);
 
             return new PackageEventsViewHolder(view);
         }
 
         @Override
         public void onBindViewHolder(PackageEventsViewHolder holder, int position) {
-//            Log.d(TAG, "onBindViewHolder");
-
             mCursor.moveToPosition(position);
 
-            holder.mIdView.setText(Integer.toString(mCursor.getInt(COL_EVENT_ORDER)));
-            holder.mContentView.setText(mCursor.getString(COL_EVENT_DESCRIPTION));
+            // set the event id
+            holder.mEventId = mCursor.getString(COL_EVENT_ORDER);
+
+            // set the event description string
+            String eventDescriptionString;
+            String eventType = mCursor.getString(COL_EVENT_TYPE);
+            String eventDescription = mCursor.getString(COL_EVENT_DESCRIPTION);
+            if (eventType.equals(TrackingContract.EventsEntry.TYPE_EVENT)) {
+                String eventDate = mCursor.getString(COL_EVENT_DATE);
+                String eventTime = mCursor.getString(COL_EVENT_TIME);
+
+                eventDescriptionString = String.format("%s, %s: %s", eventDate, eventTime, eventDescription);
+            } else {
+                eventDescriptionString = eventDescription;
+            }
+            holder.mIdView.setText(eventDescriptionString);
+
+            // set the event address string
+            String eventCity = mCursor.getString(COL_EVENT_CITY);
+            if (null == eventCity) {
+                eventCity = "";
+            }
+            String eventState = mCursor.getString(COL_EVENT_STATE);
+            if (null == eventState) {
+                eventState = "";
+            }
+            String eventZip = mCursor.getString(COL_EVENT_ZIP);
+            if (null == eventZip) {
+                eventZip = "";
+            }
+            String eventStateZip = String.format("%s %s", eventState, eventZip).trim();
+            String eventCountry = mCursor.getString(COL_EVENT_COUNTRY);
+            if (null == eventCountry) {
+                eventCountry = "";
+            }
+            String eventAddress = "";
+            if (eventCity.length() > 0) {
+                eventAddress = eventCity;
+            }
+            if (eventStateZip.length() > 0) {
+                if (eventAddress.length() == 0) {
+                    eventAddress = eventStateZip;
+                } else {
+                    eventAddress = String.format("%s, %s", eventAddress, eventStateZip);
+                }
+            }
+            if (eventCountry.length() > 0) {
+                if (eventAddress.length() > 0) {
+                    eventAddress = eventCountry;
+                } else {
+                    eventAddress = String.format("%s, %s", eventAddress, eventCountry);
+                }
+            }
+            holder.mContentView.setText(eventAddress);
+
+            // set the icon
+            Drawable icon;
+            int iconId;
+            int dateDelivered = mCursor.getInt(COL_PACKAGE_DATE_DELIVERED);
+            int packageArchived = mCursor.getInt(COL_PACKAGE_ARCHIVED);
+            // first check for the ARCHIVED flag
+            // all archived packages will have the same icon, regardless of the package status
+            if (packageArchived != 0) {
+                iconId = R.drawable.package_archived;
+            } else if (eventType.equals(TrackingContract.EventsEntry.TYPE_ERROR)) {
+                iconId = R.drawable.package_error;
+            } else if (dateDelivered != 0) {
+                iconId = R.drawable.package_delivered;
+            } else {
+                iconId = R.drawable.package_regular;
+            }
+            icon = ContextCompat.getDrawable(getContext(), iconId);
+            holder.mIconView.setImageDrawable(icon);
+            holder.mIconView.setContentDescription(eventDescriptionString);
         }
 
         @Override
@@ -200,16 +278,20 @@ public class TrackingNumberDetailFragment
 
         public class PackageEventsViewHolder extends RecyclerView.ViewHolder {
             public final View mView;
+            public final View mBackgroundView;
             public final TextView mIdView;
             public final TextView mContentView;
+            public final ImageView mIconView;
 
-            public String mPackageId;
+            public String mEventId;
 
             public PackageEventsViewHolder(View itemView) {
                 super(itemView);
                 mView = itemView;
-                mIdView = (TextView) itemView.findViewById(R.id.id);
-                mContentView = (TextView) itemView.findViewById(R.id.content);
+                mBackgroundView = itemView.findViewById(R.id.package_background_view);
+                mIdView = (TextView) itemView.findViewById(R.id.package_text1);
+                mContentView = (TextView) itemView.findViewById(R.id.package_text2);
+                mIconView = (ImageView) itemView.findViewById(R.id.package_icon);
             }
 
             @Override

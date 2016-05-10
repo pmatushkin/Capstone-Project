@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--Recreated from the now deprecated simple_list_item_2:
+https://android.googlesource.com/platform/frameworks/base/+/kitkat-release/core/res/res/layout/simple_list_item_2.xml-->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/package_background_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:mode="twoLine"
+    android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+    android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
+    android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+    android:paddingRight="?android:attr/listPreferredItemPaddingRight"
+    >
+
+    <ImageView
+        android:id="@+id/package_icon"
+        android:layout_width="?android:attr/listPreferredItemHeight"
+        android:layout_height="?android:attr/listPreferredItemHeight"
+        android:paddingTop="8dip"
+        android:paddingBottom="8dip"
+        android:scaleType="fitCenter"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/package_regular"
+        android:contentDescription="@string/content_description_package_icon"
+        >
+    </ImageView>
+
+    <TextView android:id="@+id/package_text1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/package_icon"
+        android:layout_toRightOf="@id/package_icon"
+        android:layout_marginTop="8dip"
+        android:layout_marginStart="8dip"
+        android:layout_marginLeft="8dip"
+        android:textAppearance="?android:attr/textAppearanceListItem"
+        />
+
+    <TextView android:id="@+id/package_text2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/package_text1"
+        android:layout_alignStart="@id/package_text1"
+        android:layout_alignLeft="@id/package_text1"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:ellipsize="end"
+        android:singleLine="true"
+        />
+
+</RelativeLayout>

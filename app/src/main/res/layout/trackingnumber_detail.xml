@@ -10,4 +10,4 @@
     android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
     tools:context="net.catsonmars.android.stillinmemphis.TrackingNumberDetailFragment"
-    tools:listitem="@layout/trackingnumber_list_content" />
+    tools:listitem="@layout/packageevents_list_content" />
