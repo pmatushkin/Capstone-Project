@@ -16,4 +16,9 @@
 
     <!--default content description strings-->
     <string name="content_description_package_icon">package</string>
+
+    <!--menu strings-->
+    <string name="menu_add">Add</string>
+    <string name="menu_add_hint">Add number</string>
+    <string name="menu_settings">Settings</string>
 </resources>

@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_add_package"
+        android:icon="@drawable/menu_plus"
+        android:title="@string/menu_add"
+        app:showAsAction="ifRoom|collapseActionView"
+        app:actionLayout="@layout/activity_actionview_add"
+        />
+
+    <!-- Settings, should always be in the overflow -->
+    <item android:id="@+id/action_settings"
+        android:title="@string/menu_settings"
+        app:showAsAction="never"/>
+</menu>
