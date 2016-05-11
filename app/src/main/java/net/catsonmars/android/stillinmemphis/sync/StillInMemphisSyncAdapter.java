@@ -490,7 +490,6 @@ public class StillInMemphisSyncAdapter extends AbstractThreadedSyncAdapter {
      */
     private String[] getTrackingNumbersToSync(Bundle bundle)
     {
-        // TODO implement getTrackingNumbersToSync() for syncing a single tracking number
         Log.d(TAG, "StillInMemphisSyncAdapter.getTrackingNumbersToSync(Bundle)");
 
         if (bundle.containsKey(EXTRA_TRACKING_NNMBER)) {
@@ -505,19 +504,35 @@ public class StillInMemphisSyncAdapter extends AbstractThreadedSyncAdapter {
 
     private String[] getTrackingNumbersToSync()
     {
-        // TODO implement getTrackingNumbersToSync()
         Log.d(TAG, "StillInMemphisSyncAdapter.getTrackingNumbersToSync()");
-        Log.d(TAG, "return the array of active tracking numbers from the database");
 
-        String[] a = new String[2];
+        Cursor activePackagesCursor = getContext().getContentResolver().query(
+                TrackingContract.PackagesEntry.CONTENT_URI,
+                new String[] { TrackingContract.PackagesEntry.COLUMN_TRACKING_NUMBER },
+                TrackingContract.PackagesEntry.COLUMN_ARCHIVED + " = 0 AND ("
+                + TrackingContract.PackagesEntry.COLUMN_DATE_DELIVERED + " IS NULL OR "
+                + TrackingContract.PackagesEntry.COLUMN_DATE_DELIVERED + " = 0)",
+                null, // selection args
+                null); // sort order
 
-//        a[0] = "9405503699300270004035";
-        a[0] = "9405803699300222655286";
-        a[1] = "0";
+        String[] a;
+        int packagesCount = activePackagesCursor.getCount();
+        Log.d(TAG, "active packages: " + packagesCount);
+        if (packagesCount > 0) {
+            a = new String[packagesCount];
 
-//        for (int i = 0; i < a.length; i++){
-//            a[i] = Integer.toString(i);
-//        }
+            while (activePackagesCursor.moveToNext()) {
+                int position = activePackagesCursor.getPosition();
+                String trackingNumber = activePackagesCursor.getString(0);
+
+                Log.d(TAG, String.format("%s: %s", position, trackingNumber));
+                a[position] = trackingNumber;
+            }
+        } else {
+            a = new String[0];
+        }
+
+        activePackagesCursor.close();
 
         return a;
     }
