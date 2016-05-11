@@ -181,13 +181,16 @@ public class TrackingNumberListActivity
 
         // set up the action view listener
         final Context context = this;
-        final View actionView = MenuItemCompat.getActionView(menu.findItem(R.id.action_add_package));
+        final MenuItem menuItemAddPackage = menu.findItem(R.id.action_add_package);
+        final View actionView = MenuItemCompat.getActionView(menuItemAddPackage);
         TextView textAddPackage = (TextView) actionView.findViewById(R.id.textview_add_package);
         if (textAddPackage != null) {
             textAddPackage.setOnEditorActionListener(new TextView.OnEditorActionListener() {
                 @Override
                 public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                     if (actionId == EditorInfo.IME_ACTION_DONE) {
+                        actionView.clearFocus();
+                        menuItemAddPackage.collapseActionView();
                         StillInMemphisSyncService.syncImmediatelyWithTrackingNumber(context, String.valueOf(v.getText()));
                         refresh();
                         return true;
