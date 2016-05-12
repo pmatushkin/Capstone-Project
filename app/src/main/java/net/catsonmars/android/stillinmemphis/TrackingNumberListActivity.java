@@ -17,6 +17,7 @@ import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -29,6 +30,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import net.catsonmars.android.stillinmemphis.data.TrackingContract;
 import net.catsonmars.android.stillinmemphis.sync.StillInMemphisSyncAdapter;
@@ -287,7 +289,6 @@ public class TrackingNumberListActivity
 
     public class LatestEventsAdapter
             extends RecyclerView.Adapter<LatestEventsAdapter.LatestEventsViewHolder> {
-
         private Cursor mCursor;
 
         @Override
@@ -354,7 +355,7 @@ public class TrackingNumberListActivity
             holder.mIconView.setImageDrawable(icon);
             holder.mIconView.setContentDescription("package " + packageDescriptionString);
 
-            // set the setOnClickListener
+            // set the item setOnClickListener
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -375,6 +376,17 @@ public class TrackingNumberListActivity
                     }
                 }
             });
+
+            // set the overflow icon setOnClickListener
+            holder.mOverflowIconView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    PopupMenu popup = new PopupMenu(v.getContext(), v);
+                    popup.inflate(R.menu.item_overflow_menu);
+                    popup.setOnMenuItemClickListener(holder);
+                    popup.show();
+                }
+            });
         }
 
         public void swapCursor(Cursor newCursor) {
@@ -382,12 +394,15 @@ public class TrackingNumberListActivity
             notifyDataSetChanged();
         }
 
-        public class LatestEventsViewHolder extends RecyclerView.ViewHolder {
+        public class LatestEventsViewHolder
+                extends RecyclerView.ViewHolder
+                implements PopupMenu.OnMenuItemClickListener {
             public final View mView;
             public final View mBackgroundView;
             public final TextView mIdView;
             public final TextView mContentView;
             public final ImageView mIconView;
+            public final ImageView mOverflowIconView;
 
             public String mPackageId;
 
@@ -398,6 +413,14 @@ public class TrackingNumberListActivity
                 mIdView = (TextView) itemView.findViewById(R.id.latest_text1);
                 mContentView = (TextView) itemView.findViewById(R.id.latest_text2);
                 mIconView = (ImageView) itemView.findViewById(R.id.latest_icon);
+                mOverflowIconView = (ImageView) itemView.findViewById(R.id.overflow_icon);
+            }
+
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Toast.makeText(getApplicationContext(), "onMenuItemClick on package" + mPackageId, Toast.LENGTH_LONG)
+                        .show();
+                return false;
             }
 
             @Override

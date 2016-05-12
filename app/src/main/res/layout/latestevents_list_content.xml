@@ -9,10 +9,6 @@ https://android.googlesource.com/platform/frameworks/base/+/kitkat-release/core/
     android:layout_height="wrap_content"
     android:minHeight="?android:attr/listPreferredItemHeight"
     android:mode="twoLine"
-    android:paddingStart="?android:attr/listPreferredItemPaddingStart"
-    android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
-    android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
-    android:paddingRight="?android:attr/listPreferredItemPaddingRight"
     android:background="?android:attr/selectableItemBackground"
     >
 
@@ -29,14 +25,25 @@ https://android.googlesource.com/platform/frameworks/base/+/kitkat-release/core/
         >
     </ImageView>
 
+    <ImageView
+        android:id="@+id/overflow_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="?android:attr/listPreferredItemHeight"
+        android:scaleType="fitCenter"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/dots_vertical"
+        android:contentDescription="@string/content_description_package_overflow_icon"
+        android:layout_alignParentRight="true">
+    </ImageView>
+
     <TextView android:id="@+id/latest_text1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_toEndOf="@id/latest_icon"
         android:layout_toRightOf="@id/latest_icon"
+        android:layout_toStartOf="@id/overflow_icon"
+        android:layout_toLeftOf="@id/overflow_icon"
         android:layout_marginTop="8dip"
-        android:layout_marginStart="8dip"
-        android:layout_marginLeft="8dip"
         android:textAppearance="?android:attr/textAppearanceListItem"
         android:ellipsize="end"
         android:singleLine="true"
@@ -48,6 +55,9 @@ https://android.googlesource.com/platform/frameworks/base/+/kitkat-release/core/
         android:layout_below="@id/latest_text1"
         android:layout_alignStart="@id/latest_text1"
         android:layout_alignLeft="@id/latest_text1"
+        android:layout_alignEnd="@id/latest_text1"
+        android:layout_alignRight="@id/latest_text1"
+        android:layout_marginTop="8dip"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:ellipsize="end"
         android:singleLine="true"

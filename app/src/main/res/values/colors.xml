@@ -5,6 +5,7 @@
     <color name="colorAccent">#FF4081</color>
 
     <color name="colorMenuIcon">#FFFFFF</color>
+    <color name="colorItemIcon">#000000</color>
 
     <!--package icon colors-->
     <color name="colorRegularPackage">#FF000000</color>
