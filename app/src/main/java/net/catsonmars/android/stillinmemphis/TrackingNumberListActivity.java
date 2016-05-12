@@ -1,6 +1,7 @@
 package net.catsonmars.android.stillinmemphis;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -30,7 +31,6 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import net.catsonmars.android.stillinmemphis.data.TrackingContract;
 import net.catsonmars.android.stillinmemphis.sync.StillInMemphisSyncAdapter;
@@ -418,9 +418,12 @@ public class TrackingNumberListActivity
 
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                Toast.makeText(getApplicationContext(), "onMenuItemClick on package" + mPackageId, Toast.LENGTH_LONG)
-                        .show();
-                return false;
+                ContentResolver contentResolver = getContentResolver();
+                contentResolver.delete(TrackingContract.PackagesEntry.CONTENT_URI,
+                        TrackingContract.PackagesEntry._ID + "=?",
+                        new String[] { mPackageId });
+
+                return true;
             }
 
             @Override
