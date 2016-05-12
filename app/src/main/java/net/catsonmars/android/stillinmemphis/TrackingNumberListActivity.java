@@ -31,6 +31,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import net.catsonmars.android.stillinmemphis.data.TrackingContract;
 import net.catsonmars.android.stillinmemphis.sync.StillInMemphisSyncAdapter;
@@ -418,12 +419,29 @@ public class TrackingNumberListActivity
 
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                ContentResolver contentResolver = getContentResolver();
-                contentResolver.delete(TrackingContract.PackagesEntry.CONTENT_URI,
-                        TrackingContract.PackagesEntry._ID + "=?",
-                        new String[] { mPackageId });
+                switch (item.getItemId()) {
+                    case R.id.rename_package:
+                        Toast.makeText(getApplicationContext(), "rename package", Toast.LENGTH_SHORT)
+                                .show();
+                        return true;
 
-                return true;
+                    case R.id.archive_package:
+                        Toast.makeText(getApplicationContext(), "archive package", Toast.LENGTH_SHORT)
+                                .show();
+                        return true;
+
+                    case R.id.delete_package:
+                        ContentResolver contentResolver = getContentResolver();
+                        contentResolver.delete(TrackingContract.PackagesEntry.CONTENT_URI,
+                                TrackingContract.PackagesEntry._ID + "=?",
+                                new String[] { mPackageId });
+                        return true;
+
+                    default:
+                        // If we got here, the user's action was not recognized.
+                        // Invoke the superclass to handle it.
+                        return false;
+                }
             }
 
             @Override
