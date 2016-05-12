@@ -239,7 +239,7 @@ public class TrackingNumberDetailFragment
                 }
             }
             if (eventCountry.length() > 0) {
-                if (eventAddress.length() > 0) {
+                if (eventAddress.length() == 0) {
                     eventAddress = eventCountry;
                 } else {
                     eventAddress = String.format("%s, %s", eventAddress, eventCountry);
