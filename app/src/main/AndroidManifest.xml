@@ -65,6 +65,15 @@
             <meta-data android:name="android.content.SyncAdapter"
                 android:resource="@xml/syncadapter"/>
         </service>
+
+        <!--Latest Events app widget-->
+        <receiver android:name=".widget.LatestEventsAppWidgetProvider" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/latest_events_appwidget_info" />
+        </receiver>
     </application>
 
 </manifest>

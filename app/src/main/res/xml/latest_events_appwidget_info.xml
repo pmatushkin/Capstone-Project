@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="@dimen/widget_latestevents_default_width"
+    android:minHeight="@dimen/widget_latestevents_default_height"
+    android:updatePeriodMillis="10800000"
+    android:initialLayout="@layout/widget_latest_events"
+    android:initialKeyguardLayout="@layout/widget_latest_events"
+    android:resizeMode="horizontal|vertical"
+    android:minResizeHeight="@dimen/widget_latestevents_min_height"
+    android:minResizeWidth="@dimen/widget_latestevents_min_width"
+    android:widgetCategory="home_screen|keyguard"
+    />

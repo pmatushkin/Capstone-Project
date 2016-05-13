@@ -4,4 +4,11 @@
     <dimen name="app_bar_height">200dp</dimen>
     <dimen name="item_width">200dp</dimen>
     <dimen name="text_margin">16dp</dimen>
+
+    <!--Widgets dimensions-->
+    <dimen name="widget_latestevents_default_width">250dp</dimen>
+    <dimen name="widget_latestevents_default_height">180dp</dimen>
+    <dimen name="widget_latestevents_min_width">220dp</dimen>
+    <dimen name="widget_latestevents_min_height">110dp</dimen>
+    <dimen name="widget_margin">8dp</dimen>
 </resources>
