@@ -34,4 +34,7 @@
     <!--AdMob strings-->
     <string name="banner_ad_unit_id" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
 
+    <!--Google Maps API key GOOGLE_MAPS_ANDROID_API_KEY-->
+    <string name="maps_api_key" translatable="false">GOOGLE_MAPS_ANDROID_API_KEY</string>
+
 </resources>

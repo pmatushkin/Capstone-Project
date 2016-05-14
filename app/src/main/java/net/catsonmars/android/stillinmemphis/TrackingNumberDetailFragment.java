@@ -18,6 +18,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
 import net.catsonmars.android.stillinmemphis.data.TrackingContract;
 import net.catsonmars.android.stillinmemphis.ui.DividerItemDecoration;
 
@@ -29,7 +36,7 @@ import net.catsonmars.android.stillinmemphis.ui.DividerItemDecoration;
  */
 public class TrackingNumberDetailFragment
         extends Fragment
-        implements LoaderManager.LoaderCallbacks<Cursor> {
+        implements LoaderManager.LoaderCallbacks<Cursor>, OnMapReadyCallback  {
     private static final String TAG = "NumberDetailFragment";
 
     /**
@@ -122,12 +129,38 @@ public class TrackingNumberDetailFragment
 
         View rootView = inflater.inflate(R.layout.trackingnumber_detail, container, false);
 
+        // set up map fragment
+        MapFragment mapFragment = (MapFragment) getActivity()
+                .getFragmentManager()
+                .findFragmentById(R.id.mapFragment);
+        if (null == mapFragment) {
+            Log.d(TAG, "MapFragment is not found");
+        } else {
+            Log.d(TAG, "mapFragment is found");
+            mapFragment.getMapAsync(this);
+        }
+
         // set up RecyclerView
         mRecyclerView = rootView.findViewById(R.id.trackingnumber_detail_list);
         assert mRecyclerView != null;
         setupRecyclerView((RecyclerView) mRecyclerView);
 
         return rootView;
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        Log.d(TAG, "onMapReady");
+
+        LatLng sydney = new LatLng(-33.867, 151.206);
+
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 13));
+
+        googleMap.addMarker(new MarkerOptions()
+                .visible(true)
+                .title("Sydney")
+                .snippet("The most populous city in Australia.")
+                .position(sydney));
     }
 
     @Override

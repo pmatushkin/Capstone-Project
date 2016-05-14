@@ -96,6 +96,10 @@
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
             android:theme="@android:style/Theme.Translucent" />
 
+        <!--Google Maps API key-->
+        <meta-data android:name="com.google.android.geo.API_KEY"
+            android:value="@string/maps_api_key"/>
+
     </application>
 
 </manifest>
