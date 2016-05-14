@@ -5,10 +5,13 @@
     <!--Permissions used by the sync service-->
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <!-- Permissions required by the sync adapter -->
+    <!--Permissions required by the sync adapter-->
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
+
+    <!--Permissions required by Google Mobile Ads-->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
         android:allowBackup="true"
@@ -16,6 +19,10 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <meta-data android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
         <activity
             android:name=".TrackingNumberListActivity"
             android:label="@string/app_name"
@@ -83,6 +90,11 @@
             android:permission="android.permission.BIND_REMOTEVIEWS"
             android:enabled="true"
             android:exported="false" />
+
+        <!--The AdActivity configChanges and theme.-->
+        <activity android:name="com.google.android.gms.ads.AdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
+            android:theme="@android:style/Theme.Translucent" />
 
     </application>
 

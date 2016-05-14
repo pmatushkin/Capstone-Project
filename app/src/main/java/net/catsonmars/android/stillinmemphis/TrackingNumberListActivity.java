@@ -32,6 +32,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+
 import net.catsonmars.android.stillinmemphis.data.TrackingContract;
 import net.catsonmars.android.stillinmemphis.sync.StillInMemphisSyncAdapter;
 import net.catsonmars.android.stillinmemphis.sync.StillInMemphisSyncService;
@@ -138,6 +141,19 @@ public class TrackingNumberListActivity
             // If this view is present, then the
             // activity should be in two-pane mode.
             mTwoPane = true;
+        }
+
+        // initialize the AdMob view
+        AdView mAdView = (AdView) findViewById(R.id.adView);
+        if (mAdView != null) {
+            if (mTwoPane) {
+                // hide it on the table layout
+                // it's for demo purposes only, and I didn't find a good place for the ad view
+                mAdView.setVisibility(View.GONE);
+            } else {
+                AdRequest adRequest = new AdRequest.Builder().build();
+                mAdView.loadAd(adRequest);
+            }
         }
 
         // initialize sync adapter
