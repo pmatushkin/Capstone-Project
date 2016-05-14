@@ -11,6 +11,7 @@ import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import net.catsonmars.android.stillinmemphis.R;
+import net.catsonmars.android.stillinmemphis.TrackingNumberDetailFragment;
 import net.catsonmars.android.stillinmemphis.data.TrackingContract;
 
 /**
@@ -107,6 +108,8 @@ public class LatestEventsWidgetService extends RemoteViewsService {
 
                 Log.d(TAG, "RemoteViewsFactory.getViewAt");
 
+                final String packageId = data.getString(COL_PACKAGE_ID);
+
                 RemoteViews views = getLoadingView();
                 // set the package description string
                 String packageDescriptionString = data.getString(COL_PACKAGE_DESCRIPTION);
@@ -152,7 +155,7 @@ public class LatestEventsWidgetService extends RemoteViewsService {
                 }
 
                 final Intent fillInIntent = new Intent();
-                fillInIntent.setData(TrackingContract.PackagesEntry.buildPackageUri(data.getInt(COL_PACKAGE_ID)));
+                fillInIntent.putExtra(TrackingNumberDetailFragment.ARG_PACKAGE_ID, packageId);
                 views.setOnClickFillInIntent(R.id.widget_latest_background_view, fillInIntent);
 
                 return views;
