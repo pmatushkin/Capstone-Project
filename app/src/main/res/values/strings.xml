@@ -29,4 +29,5 @@
 
     <!--widget strings-->
     <string name="empty_widget_list">No package info available.</string>
+    <string name="widget_title_latest_events">Latest events</string>
 </resources>

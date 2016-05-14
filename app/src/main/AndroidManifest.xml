@@ -67,13 +67,23 @@
         </service>
 
         <!--Latest Events app widget-->
-        <receiver android:name=".widget.LatestEventsAppWidgetProvider" >
+        <receiver
+            android:name=".widget.LatestEventsAppWidgetProvider"
+            android:enabled="true"
+            android:label="@string/widget_title_latest_events">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="net.catsonmars.android.stillinmemphis.ACTION_DATA_UPDATED" />
             </intent-filter>
             <meta-data android:name="android.appwidget.provider"
                 android:resource="@xml/latest_events_appwidget_info" />
         </receiver>
+        <!--Latest Events remote views service-->
+        <service android:name=".widget.LatestEventsWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS"
+            android:enabled="true"
+            android:exported="false" />
+
     </application>
 
 </manifest>

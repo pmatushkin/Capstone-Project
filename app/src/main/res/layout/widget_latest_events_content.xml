@@ -4,7 +4,7 @@
 https://android.googlesource.com/platform/frameworks/base/+/kitkat-release/core/res/res/layout/simple_list_item_2.xml-->
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/latest_background_view"
+    android:id="@+id/widget_latest_background_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:minHeight="?android:attr/listPreferredItemHeight"
@@ -13,7 +13,7 @@ https://android.googlesource.com/platform/frameworks/base/+/kitkat-release/core/
     >
 
     <ImageView
-        android:id="@+id/latest_icon"
+        android:id="@+id/widget_latest_icon"
         android:layout_width="?android:attr/listPreferredItemHeight"
         android:layout_height="?android:attr/listPreferredItemHeight"
         android:paddingTop="8dip"
@@ -25,27 +25,29 @@ https://android.googlesource.com/platform/frameworks/base/+/kitkat-release/core/
         >
     </ImageView>
 
-    <TextView android:id="@+id/latest_text1"
+    <TextView android:id="@+id/widget_latest_text1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/latest_icon"
-        android:layout_toRightOf="@id/latest_icon"
+        android:layout_toEndOf="@id/widget_latest_icon"
+        android:layout_toRightOf="@id/widget_latest_icon"
         android:layout_marginTop="8dip"
         android:textAppearance="?android:attr/textAppearanceListItem"
+        android:textColor="@color/primary_text"
         android:ellipsize="end"
         android:singleLine="true"
         />
 
-    <TextView android:id="@+id/latest_text2"
+    <TextView android:id="@+id/widget_latest_text2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/latest_text1"
-        android:layout_alignStart="@id/latest_text1"
-        android:layout_alignLeft="@id/latest_text1"
-        android:layout_alignEnd="@id/latest_text1"
-        android:layout_alignRight="@id/latest_text1"
+        android:layout_below="@id/widget_latest_text1"
+        android:layout_alignStart="@id/widget_latest_text1"
+        android:layout_alignLeft="@id/widget_latest_text1"
+        android:layout_alignEnd="@id/widget_latest_text1"
+        android:layout_alignRight="@id/widget_latest_text1"
         android:layout_marginTop="8dip"
         android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/secondary_text"
         android:ellipsize="end"
         android:singleLine="true"
         />
