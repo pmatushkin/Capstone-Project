@@ -53,6 +53,8 @@ import static net.catsonmars.android.stillinmemphis.XmlUtils.asList;
  */
 public class StillInMemphisSyncAdapter extends AbstractThreadedSyncAdapter {
     private static final String TAG = "MemphisSyncAdapter";
+    public static final String ACTION_DATA_UPDATED =
+            "net.catsonmars.android.stillinmemphis.ACTION_DATA_UPDATED";
 
     public static final String BROADCAST_ACTION_STATE_CHANGE
             = "net.catsonmars.android.stillinmemphis.intent.action.STATE_CHANGE";
@@ -296,8 +298,6 @@ public class StillInMemphisSyncAdapter extends AbstractThreadedSyncAdapter {
                     getContext()
                             .getContentResolver()
                             .bulkInsert(TrackingContract.EventsEntry.CONTENT_URI, cvArray);
-
-                    // TODO update notifications here
                 }
             }
         }

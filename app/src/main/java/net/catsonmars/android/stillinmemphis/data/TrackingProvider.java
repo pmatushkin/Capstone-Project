@@ -2,6 +2,8 @@ package net.catsonmars.android.stillinmemphis.data;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -9,6 +11,8 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.util.Log;
+
+import net.catsonmars.android.stillinmemphis.sync.StillInMemphisSyncAdapter;
 
 /**
  * Created by pmatushkin on 4/24/2016.
@@ -240,6 +244,7 @@ public class TrackingProvider extends ContentProvider {
         }
 
         getContext().getContentResolver().notifyChange(uri, null);
+        updateRemotes();
 
         Log.d(TAG, retUri.toString());
         return retUri;
@@ -269,6 +274,7 @@ public class TrackingProvider extends ContentProvider {
                     db.endTransaction();
                 }
                 getContext().getContentResolver().notifyChange(uri, null);
+                updateRemotes();
 
                 return retCount;
             }
@@ -305,9 +311,18 @@ public class TrackingProvider extends ContentProvider {
         // Because a null deletes all rows
         if (retDeleted != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
+            updateRemotes();
         }
 
         return retDeleted;
+    }
+
+    private void updateRemotes() {
+        Context context = getContext();
+
+        Intent dataUpdatedIntent = new Intent(StillInMemphisSyncAdapter.ACTION_DATA_UPDATED)
+                .setPackage(context.getPackageName());
+        context.sendBroadcast(dataUpdatedIntent);
     }
 
     @Override
@@ -334,6 +349,7 @@ public class TrackingProvider extends ContentProvider {
 
         if (retUpdated != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
+            updateRemotes();
         }
 
         return retUpdated;
