@@ -63,20 +63,28 @@ public class TrackingProvider extends ContentProvider {
 
         String packageId = TrackingContract.PackagesEntry.getPackageIdFromUri(uri);
 
+        // build the selection string
         //packages._ID = ?
+        if (null == selection) {
+            selection = "";
+        }
+        if (!"".equals(selection)) {
+            selection = selection + " AND ";
+        }
         selection = selection
-                + " AND ("
+                + "("
                 + TrackingContract.PackagesEntry.TABLE_NAME
                 + "."
                 + TrackingContract.PackagesEntry._ID + " = ?)";
         Log.d(TAG, selection);
 
-        // copy the arrays of arguments
-        String[] newSelectionArgs = new String[selectionArgs.length + 1];
-        for (int i = 0; i < selectionArgs.length; i++) {
-            newSelectionArgs[i] = selectionArgs[i];
+        // copy the array of arguments
+        int selectionArgsLength = null == selectionArgs ? 0 : selectionArgs.length;
+        String[] newSelectionArgs = new String[selectionArgsLength + 1];
+        if (selectionArgsLength > 0) {
+            System.arraycopy(selectionArgs, 0, newSelectionArgs, 0, selectionArgsLength);
         }
-        newSelectionArgs[selectionArgs.length] = packageId;
+        newSelectionArgs[selectionArgsLength] = packageId;
 
         return sEventsByPackageQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
@@ -94,12 +102,16 @@ public class TrackingProvider extends ContentProvider {
                                              String sortOrder) {
         Log.d(TAG, "TrackingProvider.getLatestEventForPackages()");
 
-        // only active packages, only events where order==0
-        // ((archived = 0) AND (usps_order = 0))
-//        String selection = "((" + TrackingContract.PackagesEntry.COLUMN_ARCHIVED + " = 0) AND ("
-//                + TrackingContract.EventsEntry.COLUMN_EVENT_ORDER + " = 0))";
+        // build the selection string
+        // (usps_order = 0)
+        if (null == selection) {
+            selection = "";
+        }
+        if (!"".equals(selection)) {
+            selection = selection + " AND ";
+        }
         selection = selection
-                + " AND ("
+                + "("
                 + TrackingContract.EventsEntry.COLUMN_EVENT_ORDER
                 + " = 0)";
         Log.d(TAG, selection);
