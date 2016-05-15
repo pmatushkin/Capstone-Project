@@ -1,7 +1,10 @@
 package net.catsonmars.android.stillinmemphis;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -28,6 +31,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import net.catsonmars.android.stillinmemphis.data.TrackingContract;
 import net.catsonmars.android.stillinmemphis.ui.DividerItemDecoration;
 
+import java.util.List;
+import java.util.Locale;
+
 /**
  * A fragment representing a single Tracking Number detail screen.
  * This fragment is either contained in a {@link TrackingNumberListActivity}
@@ -52,6 +58,9 @@ public class TrackingNumberDetailFragment
 
     private PackageEventsAdapter mPackageEventsAdapter;
     private View mRecyclerView;
+
+    private MapFragment mMapFragment;
+    private GoogleMap mGoogleMap;
 
     private static final int EVENTS_LOADER = 1;
     private static final String[] EVENTS_COLUMNS = {
@@ -130,14 +139,15 @@ public class TrackingNumberDetailFragment
         View rootView = inflater.inflate(R.layout.trackingnumber_detail, container, false);
 
         // set up map fragment
-        MapFragment mapFragment = (MapFragment) getActivity()
+        mGoogleMap = null;
+        mMapFragment = (MapFragment) getActivity()
                 .getFragmentManager()
                 .findFragmentById(R.id.mapFragment);
-        if (null == mapFragment) {
+        if (null == mMapFragment) {
             Log.d(TAG, "MapFragment is not found");
         } else {
             Log.d(TAG, "mapFragment is found");
-            mapFragment.getMapAsync(this);
+            mMapFragment.getMapAsync(this);
         }
 
         // set up RecyclerView
@@ -151,16 +161,7 @@ public class TrackingNumberDetailFragment
     @Override
     public void onMapReady(GoogleMap googleMap) {
         Log.d(TAG, "onMapReady");
-
-        LatLng sydney = new LatLng(-33.867, 151.206);
-
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 13));
-
-        googleMap.addMarker(new MarkerOptions()
-                .visible(true)
-                .title("Sydney")
-                .snippet("The most populous city in Australia.")
-                .position(sydney));
+        mGoogleMap = googleMap;
     }
 
     @Override
@@ -226,11 +227,16 @@ public class TrackingNumberDetailFragment
             mCursor.moveToPosition(position);
 
             // set the event id
-            holder.mEventId = mCursor.getString(COL_EVENT_ORDER);
+            String eventId = mCursor.getString(COL_EVENT_ORDER);
+            holder.mEventId = eventId;
+
+            Context context = getContext();
+
+            // get the event type (event/error)
+            String eventType = mCursor.getString(COL_EVENT_TYPE);
 
             // set the event description string
             String eventDescriptionString;
-            String eventType = mCursor.getString(COL_EVENT_TYPE);
             String eventDescription = mCursor.getString(COL_EVENT_DESCRIPTION);
             if (eventType.equals(TrackingContract.EventsEntry.TYPE_EVENT)) {
                 String eventDate = mCursor.getString(COL_EVENT_DATE);
@@ -280,6 +286,58 @@ public class TrackingNumberDetailFragment
             }
             holder.mContentView.setText(eventAddress);
 
+            // show/hide map fragment depending on the event type
+            if (mMapFragment != null) {
+                View mapFragmentView = mMapFragment.getView();
+
+                if (mapFragmentView != null) {
+                    if (eventType.equals(TrackingContract.EventsEntry.TYPE_ERROR)) {
+                        mapFragmentView.setVisibility(View.GONE);
+                    } else if (mMapFragment.getView().getVisibility() == View.GONE) {
+                        mapFragmentView.setVisibility(View.VISIBLE);
+                    }
+
+                    if (mMapFragment.getView().getVisibility() == View.VISIBLE
+                            && eventId.equals("0")) {
+                        // make no more than 10 attempts to geocode the address
+                        Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+                        int maxGeocodingResults = 1;
+
+                        try {
+                            int maxGeocodingAttempts = 10;
+                            int currGeocodingAttempts = 0;
+
+                            List<Address> geocodingResults =
+                                    geocoder.getFromLocationName(eventAddress, maxGeocodingResults);
+
+                            while (0 == geocodingResults.size()
+                                    && currGeocodingAttempts < maxGeocodingAttempts) {
+                                geocodingResults =
+                                        geocoder.getFromLocationName(eventAddress, maxGeocodingResults);
+
+                                currGeocodingAttempts++;
+                            }
+
+                            // set up the map marker
+                            if (geocodingResults.size() > 0) {
+                                Address address = geocodingResults.get(0);
+                                LatLng latLng
+                                        = new LatLng(address.getLatitude(), address.getLongitude());
+
+                                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
+                                mGoogleMap.addMarker(new MarkerOptions()
+                                        .visible(true)
+                                        .title(eventAddress)
+                                        .snippet(eventDescriptionString)
+                                        .position(latLng));
+                            }
+                        } catch (Exception e) {
+                            Log.e(TAG, e.toString());
+                        }
+                    }
+                }
+            }
+
             // set the icon
             Drawable icon;
             int iconId;
@@ -296,15 +354,13 @@ public class TrackingNumberDetailFragment
             } else {
                 iconId = R.drawable.package_regular;
             }
-            icon = ContextCompat.getDrawable(getContext(), iconId);
+            icon = ContextCompat.getDrawable(context, iconId);
             holder.mIconView.setImageDrawable(icon);
             holder.mIconView.setContentDescription(eventDescriptionString);
         }
 
         @Override
         public int getItemCount() {
-//            Log.d(TAG, "getItemCount");
-
             return null == mCursor ?
                     0
                     :
