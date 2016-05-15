@@ -405,6 +405,23 @@ public class StillInMemphisSyncAdapter extends AbstractThreadedSyncAdapter {
                 retValues.put(TrackingContract.EventsEntry.COLUMN_COUNTRY, country);
         }
 
+        // update the package delivery date
+        if (0 == trackDetailElementIndex
+                && description != null
+                && description.contains("Delivered")) {
+            long normalizedDate = TrackingContract.normalizeDate(date, time);
+
+            ContentValues packageValues = new ContentValues();
+            packageValues.put(TrackingContract.PackagesEntry.COLUMN_DATE_DELIVERED, normalizedDate);
+
+            getContext().getContentResolver().update(
+                    TrackingContract.PackagesEntry.CONTENT_URI,
+                    packageValues,
+                    TrackingContract.PackagesEntry._ID + " = ?",
+                    new String[] { String.valueOf(packageId) }
+            );
+        }
+
         return retValues;
     }
 
