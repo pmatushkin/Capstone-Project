@@ -54,41 +54,60 @@ public class TrackingProvider extends ContentProvider {
         return matcher;
     }
 
-    private Cursor getEventsForPackage(Uri uri, String[] projection, String sortOrder) {
+    private Cursor getEventsForPackage(Uri uri,
+                                       String[] projection,
+                                       String selection,
+                                       String[] selectionArgs,
+                                       String sortOrder) {
         Log.d(TAG, "TrackingProvider.getEventsForPackage()");
 
         String packageId = TrackingContract.PackagesEntry.getPackageIdFromUri(uri);
 
         //packages._ID = ?
-        String selection = TrackingContract.PackagesEntry.TABLE_NAME
+        selection = selection
+                + " AND ("
+                + TrackingContract.PackagesEntry.TABLE_NAME
                 + "."
-                + TrackingContract.PackagesEntry._ID + " = ?";
+                + TrackingContract.PackagesEntry._ID + " = ?)";
         Log.d(TAG, selection);
-        String[] selectionArgs = new String[] { packageId };
+
+        // copy the arrays of arguments
+        String[] newSelectionArgs = new String[selectionArgs.length + 1];
+        for (int i = 0; i < selectionArgs.length; i++) {
+            newSelectionArgs[i] = selectionArgs[i];
+        }
+        newSelectionArgs[selectionArgs.length] = packageId;
 
         return sEventsByPackageQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
                 selection,
-                selectionArgs,
+                newSelectionArgs,
                 null,
                 null,
                 sortOrder
         );
     }
 
-    private Cursor getLatestEventForPackages(String[] projection, String sortOrder) {
+    private Cursor getLatestEventForPackages(String[] projection,
+                                             String selection,
+                                             String[] selectionArgs,
+                                             String sortOrder) {
         Log.d(TAG, "TrackingProvider.getLatestEventForPackages()");
 
         // only active packages, only events where order==0
         // ((archived = 0) AND (usps_order = 0))
-        String selection = "((" + TrackingContract.PackagesEntry.COLUMN_ARCHIVED + " = 0) AND ("
-                + TrackingContract.EventsEntry.COLUMN_EVENT_ORDER + " = 0))";
+//        String selection = "((" + TrackingContract.PackagesEntry.COLUMN_ARCHIVED + " = 0) AND ("
+//                + TrackingContract.EventsEntry.COLUMN_EVENT_ORDER + " = 0))";
+        selection = selection
+                + " AND ("
+                + TrackingContract.EventsEntry.COLUMN_EVENT_ORDER
+                + " = 0)";
         Log.d(TAG, selection);
 
         return sEventsByPackageQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
                 selection,
-                null,
+                selectionArgs,
                 null,
                 null,
                 sortOrder
@@ -176,14 +195,21 @@ public class TrackingProvider extends ContentProvider {
                 break;
             }
             case PACKAGE_WITH_EVENTS: {
-                retCursor = getEventsForPackage(uri, projection, sortOrder);
+                retCursor = getEventsForPackage(uri,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        sortOrder);
                 retCursor.setNotificationUri(getContext().getContentResolver(),
                         TrackingContract.BASE_CONTENT_URI);
 
                 break;
             }
             case PACKAGES_WITH_LATEST_EVENT: {
-                retCursor = getLatestEventForPackages(projection, sortOrder);
+                retCursor = getLatestEventForPackages(projection,
+                        selection,
+                        selectionArgs,
+                        sortOrder);
                 retCursor.setNotificationUri(getContext().getContentResolver(),
                         TrackingContract.BASE_CONTENT_URI);
 
