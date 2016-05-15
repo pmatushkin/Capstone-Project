@@ -6,9 +6,11 @@
         >
         <item
             android:id="@+id/nav_active"
+            android:icon="@drawable/format_list_bulleted"
             android:title="@string/menu_active" />
         <item
             android:id="@+id/nav_archive"
+            android:icon="@drawable/history"
             android:title="@string/menu_archive" />
     </group>
     <!--<group-->
@@ -16,6 +18,7 @@
         <!--android:checkableBehavior="single">-->
         <!--<item-->
             <!--android:id="@+id/nav_settings"-->
-            <!--android:title="Settings" />-->
+            <!--android:icon="@drawable/settings"-->
+            <!--android:title="@string/menu_settings" />-->
     <!--</group>-->
 </menu>

@@ -7,6 +7,7 @@
     <!--app icon colors-->
     <color name="colorMenuIcon">#FFFFFF</color>
     <color name="colorItemIcon">#000000</color>
+    <color name="colorOverflowMenuIcon">#000000</color>
 
     <!--package icon colors-->
     <color name="colorRegularPackage">#FF000000</color>
