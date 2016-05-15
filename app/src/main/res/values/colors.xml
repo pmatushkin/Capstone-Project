@@ -5,15 +5,15 @@
     <color name="colorAccent">#FF4081</color>
 
     <!--app icon colors-->
-    <color name="colorMenuIcon">#FFFFFF</color>
-    <color name="colorItemIcon">#000000</color>
-    <color name="colorOverflowMenuIcon">#000000</color>
+    <!--<color name="colorMenuIcon">#FFFFFF</color>-->
+    <!--<color name="colorItemIcon">#000000</color>-->
+    <!--<color name="colorOverflowMenuIcon">#000000</color>-->
 
     <!--package icon colors-->
-    <color name="colorRegularPackage">#FF000000</color>
-    <color name="colorErrorPackage">#FFF44336</color>
-    <color name="colorDeliveredPackage">#FF4CAF50</color>
-    <color name="colorArchivedPackage">#FF9E9E9E</color>
+    <!--<color name="colorRegularPackage">#FF000000</color>-->
+    <!--<color name="colorErrorPackage">#FFF44336</color>-->
+    <!--<color name="colorDeliveredPackage">#FF4CAF50</color>-->
+    <!--<color name="colorArchivedPackage">#FF9E9E9E</color>-->
 
     <!--general colors-->
     <color name="white">#FFFFFF</color>
