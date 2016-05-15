@@ -107,7 +107,6 @@ public class TrackingNumberDetailFragment
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        // TODO fix onCreate by removing the references to the dummy object
         super.onCreate(savedInstanceState);
 
         Log.d(TAG, "onCreate");
@@ -128,7 +127,6 @@ public class TrackingNumberDetailFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // TODO fix onCreate by removing the references to the dummy object
         Log.d(TAG, "onCreateView");
 
         CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) getActivity().findViewById(R.id.toolbar_layout);
