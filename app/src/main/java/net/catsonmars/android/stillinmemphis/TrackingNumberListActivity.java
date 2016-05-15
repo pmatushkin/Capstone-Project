@@ -2,6 +2,7 @@ package net.catsonmars.android.stillinmemphis;
 
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -544,8 +545,10 @@ public class TrackingNumberListActivity
                 @Override
                 public void onClick(View v) {
                     PopupMenu popup = new PopupMenu(v.getContext(), v);
-                    // TODO modify the menu items for Active/Archive modes
-                    popup.inflate(R.menu.item_overflow_menu);
+                    popup.inflate(MODE_ACTIVE == mListMode ?
+                            R.menu.item_overflow_menu_active
+                            :
+                            R.menu.item_overflow_menu_archive);
                     popup.setOnMenuItemClickListener(holder);
                     popup.show();
                 }
@@ -581,27 +584,45 @@ public class TrackingNumberListActivity
 
             @Override
             public boolean onMenuItemClick(MenuItem item) {
+                ContentResolver contentResolver = getContentResolver();
+                ContentValues cv;
+
                 switch (item.getItemId()) {
                     case R.id.rename_package:
                         Toast.makeText(getApplicationContext(), "rename package", Toast.LENGTH_SHORT)
                                 .show();
+
                         return true;
 
                     case R.id.archive_package:
-                        Toast.makeText(getApplicationContext(), "archive package", Toast.LENGTH_SHORT)
-                                .show();
+                        cv = new ContentValues(1);
+                        cv.put(TrackingContract.PackagesEntry.COLUMN_ARCHIVED, "1");
+                        contentResolver.update(TrackingContract.PackagesEntry.CONTENT_URI,
+                                cv,
+                                TrackingContract.PackagesEntry._ID + "=?",
+                                new String[] { mPackageId });
+
+                        return true;
+
+                    case R.id.move_to_active_package:
+                        cv = new ContentValues(1);
+                        cv.put(TrackingContract.PackagesEntry.COLUMN_ARCHIVED, "0");
+                        contentResolver.update(TrackingContract.PackagesEntry.CONTENT_URI,
+                                cv,
+                                TrackingContract.PackagesEntry._ID + "=?",
+                                new String[] { mPackageId });
+
                         return true;
 
                     case R.id.delete_package:
-                        ContentResolver contentResolver = getContentResolver();
                         contentResolver.delete(TrackingContract.PackagesEntry.CONTENT_URI,
                                 TrackingContract.PackagesEntry._ID + "=?",
                                 new String[] { mPackageId });
+
                         return true;
 
                     default:
-                        // If we got here, the user's action was not recognized.
-                        // Invoke the superclass to handle it.
+
                         return false;
                 }
             }
