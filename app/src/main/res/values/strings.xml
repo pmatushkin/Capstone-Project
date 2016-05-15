@@ -25,7 +25,8 @@
     <string name="menu_delete">Delete</string>
     <string name="menu_rename">Rename</string>
     <string name="menu_archive">Archive</string>
-    <string name="menu_move_to_active">Move to active</string>
+    <string name="menu_active">Active</string>
+    <string name="menu_move_to_active">Move to Active</string>
 
     <!--widget strings-->
     <string name="empty_widget_list">No package info available.</string>

@@ -10,11 +10,14 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
@@ -53,6 +56,11 @@ public class TrackingNumberListActivity
         implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String TAG = "NumberListActivity";
 
+    private static final String ARG_LIST_MODE = "ARG_LIST_MODE";
+    private static final int MODE_ACTIVE = 0;
+    private static final int MODE_ARCHIVE = 1;
+    private int mListMode;
+
     private boolean mTwoPane;
 
     private boolean mIsRefreshing = false;
@@ -90,6 +98,7 @@ public class TrackingNumberListActivity
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private LatestEventsAdapter mLatestEventsAdapter;
     private View mRecyclerView;
+    private DrawerLayout mDrawer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +113,12 @@ public class TrackingNumberListActivity
         if (toolbar != null) {
             toolbar.setTitle(getTitle());
         }
+
+        // set up drawer
+        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        NavigationView nvDrawer = (NavigationView) findViewById(R.id.nvView);
+        // Setup drawer view
+        setupDrawerContent(nvDrawer);
 
         // set up FAB
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -159,12 +174,22 @@ public class TrackingNumberListActivity
         // initialize sync adapter
         StillInMemphisSyncService.initializeSyncAdapter(this);
 
-        // Prepare the loader
-        if (getSupportLoaderManager().getLoader(PACKAGES_LOADER) == null) {
-            getSupportLoaderManager().initLoader(PACKAGES_LOADER, savedInstanceState, this);
+        // set up the list mode
+        if (savedInstanceState == null) {
+            mListMode = MODE_ACTIVE;
         } else {
-            getSupportLoaderManager().restartLoader(PACKAGES_LOADER, savedInstanceState, this);
+            if (savedInstanceState.containsKey(ARG_LIST_MODE)) {
+                mListMode = savedInstanceState.getInt(ARG_LIST_MODE);
+            }
         }
+
+        // set up loader
+        setupLoader(savedInstanceState);
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
     }
 
     /**
@@ -194,28 +219,36 @@ public class TrackingNumberListActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        Log.d(TAG, "onCreateOptionsMenu");
+
         getMenuInflater().inflate(R.menu.main, menu);
 
         // set up the action view listener
         final Context context = this;
         final MenuItem menuItemAddPackage = menu.findItem(R.id.action_add_package);
-        final View actionView = MenuItemCompat.getActionView(menuItemAddPackage);
-        TextView textAddPackage = (TextView) actionView.findViewById(R.id.textview_add_package);
-        if (textAddPackage != null) {
-            textAddPackage.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-                @Override
-                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                    if (actionId == EditorInfo.IME_ACTION_DONE) {
-                        actionView.clearFocus();
-                        menuItemAddPackage.collapseActionView();
-                        StillInMemphisSyncService.syncImmediatelyWithTrackingNumber(context, String.valueOf(v.getText()));
-                        refresh();
-                        return true;
-                    } else {
-                        return false;
+        if (MODE_ARCHIVE == mListMode) {
+            menuItemAddPackage.setVisible(false);
+        } else {
+            menuItemAddPackage.setVisible(true);
+
+            final View actionView = MenuItemCompat.getActionView(menuItemAddPackage);
+            TextView textAddPackage = (TextView) actionView.findViewById(R.id.textview_add_package);
+            if (textAddPackage != null) {
+                textAddPackage.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                    @Override
+                    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                        if (actionId == EditorInfo.IME_ACTION_DONE) {
+                            actionView.clearFocus();
+                            menuItemAddPackage.collapseActionView();
+                            StillInMemphisSyncService.syncImmediatelyWithTrackingNumber(context, String.valueOf(v.getText()));
+                            refresh();
+                            return true;
+                        } else {
+                            return false;
+                        }
                     }
-                }
-            });
+                });
+            }
         }
 
         return true;
@@ -231,6 +264,10 @@ public class TrackingNumberListActivity
             case R.id.action_add_package:
                 return true;
 
+            case android.R.id.home:
+                mDrawer.openDrawer(GravityCompat.START);
+                return true;
+
             default:
                 // If we got here, the user's action was not recognized.
                 // Invoke the superclass to handle it.
@@ -239,20 +276,36 @@ public class TrackingNumberListActivity
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putInt(ARG_LIST_MODE, mListMode);
+    }
+
+    @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.d(TAG, "onCreateLoader");
 
-        // TODO maybe consider the sorting preferences set by user
+        // TODO consider the sorting preferences set by user
         String sortOrder = TrackingContract.EventsEntry.COLUMN_TIMESTAMP + " DESC";
 
-        // TODO use selection and selection args to retrieve active or archived tracking numbers
-        return new CursorLoader(this,
-                // all events
-                TrackingContract.PackagesEntry.buildPackagesWithLatestEventUri(),
-                PACKAGES_COLUMNS,
-                null, // selection
-                null, // selection args
-                sortOrder);
+        if (MODE_ACTIVE == mListMode) {
+            Log.d(TAG, "MODE_ACTIVE");
+            return new CursorLoader(this,
+                    TrackingContract.PackagesEntry.buildPackagesWithLatestEventUri(),
+                    PACKAGES_COLUMNS,
+                    TrackingContract.PackagesEntry.COLUMN_ARCHIVED + " = 0", // selection
+                    null, // selection args
+                    sortOrder);
+        } else {
+            Log.d(TAG, "MODE_ARCHIVE");
+            return new CursorLoader(this,
+                    TrackingContract.PackagesEntry.buildPackagesWithLatestEventUri(),
+                    PACKAGES_COLUMNS,
+                    TrackingContract.PackagesEntry.COLUMN_ARCHIVED + " != 0", // selection
+                    null, // selection args
+                    sortOrder);
+        }
     }
 
     @Override
@@ -276,6 +329,56 @@ public class TrackingNumberListActivity
 
         recyclerView.addItemDecoration(new DividerItemDecoration(this));
         recyclerView.setAdapter(mLatestEventsAdapter);
+    }
+
+    private void setupLoader(Bundle savedInstanceState) {
+        if (getSupportLoaderManager().getLoader(PACKAGES_LOADER) == null) {
+            getSupportLoaderManager().initLoader(PACKAGES_LOADER, savedInstanceState, this);
+        } else {
+            getSupportLoaderManager().restartLoader(PACKAGES_LOADER, savedInstanceState, this);
+        }
+    }
+
+    private void setupDrawerContent(NavigationView nvDrawer) {
+        nvDrawer.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        selectDrawerItem(menuItem);
+                        return true;
+                    }
+                });
+    }
+
+    public void selectDrawerItem(MenuItem menuItem) {
+        switch(menuItem.getItemId()) {
+            case R.id.nav_active:
+                mListMode = MODE_ACTIVE;
+                break;
+
+            case R.id.nav_archive:
+                mListMode = MODE_ARCHIVE;
+                break;
+
+            // TODO add Settings activity
+//            case R.id.nav_settings:
+//                break;
+        }
+
+        // hide the Add Package option in the Archive mode
+        invalidateOptionsMenu();
+
+        // set up the new cursor
+        setupLoader(null);
+
+        // Highlight the selected item has been done by NavigationView
+        menuItem.setChecked(true);
+
+        // Set action bar title
+        //setTitle(menuItem.getTitle());
+
+        // Close the navigation drawer
+        mDrawer.closeDrawers();
     }
 
     private void refresh() {
@@ -397,6 +500,7 @@ public class TrackingNumberListActivity
                 @Override
                 public void onClick(View v) {
                     PopupMenu popup = new PopupMenu(v.getContext(), v);
+                    // TODO modify the menu items for Active/Archive modes
                     popup.inflate(R.menu.item_overflow_menu);
                     popup.setOnMenuItemClickListener(holder);
                     popup.show();
