@@ -38,4 +38,8 @@
     <!--Google Maps API key GOOGLE_MAPS_ANDROID_API_KEY-->
     <string name="maps_api_key" translatable="false">GOOGLE_MAPS_ANDROID_API_KEY</string>
 
+    <!--drawer strings-->
+    <string name="drawer_open">open drawer</string>
+    <string name="drawer_close">close drawer</string>
+
 </resources>

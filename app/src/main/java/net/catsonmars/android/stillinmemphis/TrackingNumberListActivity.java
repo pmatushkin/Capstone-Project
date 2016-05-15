@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -98,7 +100,8 @@ public class TrackingNumberListActivity
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private LatestEventsAdapter mLatestEventsAdapter;
     private View mRecyclerView;
-    private DrawerLayout mDrawer;
+    private DrawerLayout mDrawerLayout;
+    private ActionBarDrawerToggle mDrawerToggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,11 +117,40 @@ public class TrackingNumberListActivity
             toolbar.setTitle(getTitle());
         }
 
+        android.support.v7.app.ActionBar actionbar = getSupportActionBar();
+        if (actionbar != null) {
+            Log.d(TAG, "found ActionBar");
+
+            actionbar.setDisplayHomeAsUpEnabled(true);
+            actionbar.setHomeButtonEnabled(true);
+        }
+
         // set up drawer
-        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         NavigationView nvDrawer = (NavigationView) findViewById(R.id.nvView);
         // Setup drawer view
         setupDrawerContent(nvDrawer);
+
+        // ActionBarDrawerToggle ties together the the proper interactions
+        // between the sliding drawer and the action bar app icon
+        mDrawerToggle = new ActionBarDrawerToggle(
+                this,                  /* host Activity */
+                mDrawerLayout,         /* DrawerLayout object */
+                R.string.drawer_open,  /* "open drawer" description for accessibility */
+                R.string.drawer_close  /* "close drawer" description for accessibility */
+        ) {
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+        };
+        mDrawerToggle.setDrawerIndicatorEnabled(true);
+        mDrawerLayout.addDrawerListener(mDrawerToggle);
 
         // set up FAB
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -142,6 +174,7 @@ public class TrackingNumberListActivity
             }
         });
 
+        // set up adapter
         mLatestEventsAdapter = new LatestEventsAdapter();
 
         // set up RecyclerView
@@ -190,6 +223,13 @@ public class TrackingNumberListActivity
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
     /**
@@ -256,6 +296,10 @@ public class TrackingNumberListActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+
         switch (item.getItemId()) {
             case R.id.action_settings:
                 // User chose the "Settings" item, show the app settings UI...
@@ -265,7 +309,7 @@ public class TrackingNumberListActivity
                 return true;
 
             case android.R.id.home:
-                mDrawer.openDrawer(GravityCompat.START);
+                mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
 
             default:
@@ -378,7 +422,7 @@ public class TrackingNumberListActivity
         //setTitle(menuItem.getTitle());
 
         // Close the navigation drawer
-        mDrawer.closeDrawers();
+        mDrawerLayout.closeDrawers();
     }
 
     private void refresh() {
