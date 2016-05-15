@@ -11,10 +11,19 @@ android {
         versionCode 1
         versionName "1.0"
     }
+    signingConfigs {
+        release {
+            keyAlias 'CapstoneProject'
+            keyPassword 'Bo6MdhThPjuz74H8sbKx'
+            storeFile file('../keystore/capstone_keystore.jks')
+            storePassword 'r8trQX5MqaZgKsWXhhRu'
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     buildTypes.each {
