@@ -60,6 +60,7 @@ public class TrackingNumberDetailFragment
     private View mRecyclerView;
 
     private MapFragment mMapFragment;
+    private View mMapView;
     private GoogleMap mGoogleMap;
 
     private static final int EVENTS_LOADER = 1;
@@ -146,6 +147,7 @@ public class TrackingNumberDetailFragment
         } else {
             Log.d(TAG, "mapFragment is found");
             mMapFragment.getMapAsync(this);
+            mMapView = mMapFragment.getView();
         }
 
         // set up RecyclerView
@@ -188,6 +190,15 @@ public class TrackingNumberDetailFragment
         Log.d(TAG, "onLoadFinished");
 
         Log.d(TAG, "returned records: " + data.getCount());
+
+        // Hide the map if there is no event data to display,
+        // because the map is displayed for the first event only.
+        // No events -> no map.
+        // It happens for example when in a two-pane mode
+        // a package is selected, and then deleted.
+        if (data.getCount() == 0 && mMapView != null) {
+            mMapView.setVisibility(View.GONE);
+        }
 
         mPackageEventsAdapter.swapCursor(data);
     }
@@ -285,53 +296,49 @@ public class TrackingNumberDetailFragment
             holder.mContentView.setText(eventAddress);
 
             // show/hide map fragment depending on the event type
-            if (mMapFragment != null) {
-                View mapFragmentView = mMapFragment.getView();
+            if (mMapView != null) {
+                if (eventType.equals(TrackingContract.EventsEntry.TYPE_ERROR)) {
+                    mMapView.setVisibility(View.GONE);
+                } else if (mMapView.getVisibility() == View.GONE) {
+                    mMapView.setVisibility(View.VISIBLE);
+                }
 
-                if (mapFragmentView != null) {
-                    if (eventType.equals(TrackingContract.EventsEntry.TYPE_ERROR)) {
-                        mapFragmentView.setVisibility(View.GONE);
-                    } else if (mMapFragment.getView().getVisibility() == View.GONE) {
-                        mapFragmentView.setVisibility(View.VISIBLE);
-                    }
+                if (mMapView.getVisibility() == View.VISIBLE
+                        && eventId.equals("0")) {
+                    // make no more than 10 attempts to geocode the address
+                    Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+                    int maxGeocodingResults = 1;
 
-                    if (mMapFragment.getView().getVisibility() == View.VISIBLE
-                            && eventId.equals("0")) {
-                        // make no more than 10 attempts to geocode the address
-                        Geocoder geocoder = new Geocoder(context, Locale.getDefault());
-                        int maxGeocodingResults = 1;
+                    try {
+                        int maxGeocodingAttempts = 10;
+                        int currGeocodingAttempts = 0;
 
-                        try {
-                            int maxGeocodingAttempts = 10;
-                            int currGeocodingAttempts = 0;
+                        List<Address> geocodingResults =
+                                geocoder.getFromLocationName(eventAddress, maxGeocodingResults);
 
-                            List<Address> geocodingResults =
+                        while (0 == geocodingResults.size()
+                                && currGeocodingAttempts < maxGeocodingAttempts) {
+                            geocodingResults =
                                     geocoder.getFromLocationName(eventAddress, maxGeocodingResults);
 
-                            while (0 == geocodingResults.size()
-                                    && currGeocodingAttempts < maxGeocodingAttempts) {
-                                geocodingResults =
-                                        geocoder.getFromLocationName(eventAddress, maxGeocodingResults);
-
-                                currGeocodingAttempts++;
-                            }
-
-                            // set up the map marker
-                            if (geocodingResults.size() > 0) {
-                                Address address = geocodingResults.get(0);
-                                LatLng latLng
-                                        = new LatLng(address.getLatitude(), address.getLongitude());
-
-                                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
-                                mGoogleMap.addMarker(new MarkerOptions()
-                                        .visible(true)
-                                        .title(eventAddress)
-                                        .snippet(eventDescriptionString)
-                                        .position(latLng));
-                            }
-                        } catch (Exception e) {
-                            Log.e(TAG, e.toString());
+                            currGeocodingAttempts++;
                         }
+
+                        // set up the map marker
+                        if (geocodingResults.size() > 0) {
+                            Address address = geocodingResults.get(0);
+                            LatLng latLng
+                                    = new LatLng(address.getLatitude(), address.getLongitude());
+
+                            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
+                            mGoogleMap.addMarker(new MarkerOptions()
+                                    .visible(true)
+                                    .title(eventAddress)
+                                    .snippet(eventDescriptionString)
+                                    .position(latLng));
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, e.toString());
                     }
                 }
             }
