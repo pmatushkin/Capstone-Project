@@ -65,6 +65,7 @@ public class TrackingNumberListActivity
     private int mListMode;
 
     private boolean mTwoPane;
+    private View mTrackingDetailTwoPane;
 
     private boolean mIsRefreshing = false;
 
@@ -190,6 +191,16 @@ public class TrackingNumberListActivity
             // If this view is present, then the
             // activity should be in two-pane mode.
             mTwoPane = true;
+
+            // Set up the tracking detail view.
+            // In two-pane mode it contains the tracking detail container (a RecyclerView)
+            // and a map fragment.
+            mTrackingDetailTwoPane = findViewById(R.id.trackingnumber_detail);
+
+            // Hide it when the app starts.
+            if (mTrackingDetailTwoPane != null) {
+                mTrackingDetailTwoPane.setVisibility(View.INVISIBLE);
+            }
         }
 
         // initialize the AdMob view
@@ -399,10 +410,16 @@ public class TrackingNumberListActivity
         switch(menuItem.getItemId()) {
             case R.id.nav_active:
                 mListMode = MODE_ACTIVE;
+                if (mTrackingDetailTwoPane != null) {
+                    mTrackingDetailTwoPane.setVisibility(View.INVISIBLE);
+                }
                 break;
 
             case R.id.nav_archive:
                 mListMode = MODE_ARCHIVE;
+                if (mTrackingDetailTwoPane != null) {
+                    mTrackingDetailTwoPane.setVisibility(View.INVISIBLE);
+                }
                 break;
 
             // TODO add Settings activity
@@ -530,6 +547,9 @@ public class TrackingNumberListActivity
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.trackingnumber_detail_container, fragment)
                                 .commit();
+                        if (mTrackingDetailTwoPane != null) {
+                            mTrackingDetailTwoPane.setVisibility(View.VISIBLE);
+                        }
                     } else {
                         Context context = v.getContext();
                         Intent intent = new Intent(context, TrackingNumberDetailActivity.class);
@@ -601,6 +621,9 @@ public class TrackingNumberListActivity
                                 cv,
                                 TrackingContract.PackagesEntry._ID + "=?",
                                 new String[] { mPackageId });
+                        if (mTrackingDetailTwoPane != null) {
+                            mTrackingDetailTwoPane.setVisibility(View.INVISIBLE);
+                        }
 
                         return true;
 
@@ -611,6 +634,9 @@ public class TrackingNumberListActivity
                                 cv,
                                 TrackingContract.PackagesEntry._ID + "=?",
                                 new String[] { mPackageId });
+                        if (mTrackingDetailTwoPane != null) {
+                            mTrackingDetailTwoPane.setVisibility(View.INVISIBLE);
+                        }
 
                         return true;
 
@@ -618,6 +644,9 @@ public class TrackingNumberListActivity
                         contentResolver.delete(TrackingContract.PackagesEntry.CONTENT_URI,
                                 TrackingContract.PackagesEntry._ID + "=?",
                                 new String[] { mPackageId });
+                        if (mTrackingDetailTwoPane != null) {
+                            mTrackingDetailTwoPane.setVisibility(View.INVISIBLE);
+                        }
 
                         return true;
 
