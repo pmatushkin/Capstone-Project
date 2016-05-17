@@ -6,8 +6,6 @@
     android:name="net.catsonmars.android.stillinmemphis.TrackingNumberDetailFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
     tools:context="net.catsonmars.android.stillinmemphis.TrackingNumberDetailFragment"
     tools:listitem="@layout/packageevents_list_content" />
