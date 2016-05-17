@@ -75,6 +75,9 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:background="@color/white"
+        app:itemBackground="@drawable/nav_view_item_background"
+        app:itemTextColor="@color/primary_text"
+        app:itemIconTint="@color/primary_text"
         app:menu="@menu/drawer"
         app:headerLayout="@layout/nav_header" />
 

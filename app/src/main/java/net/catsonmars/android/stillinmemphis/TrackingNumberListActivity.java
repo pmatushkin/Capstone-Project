@@ -66,6 +66,7 @@ public class TrackingNumberListActivity
 
     private boolean mTwoPane;
     private View mTrackingDetailTwoPane;
+    private int mSelectedPosition;
 
     private boolean mIsRefreshing = false;
 
@@ -202,6 +203,12 @@ public class TrackingNumberListActivity
                 mTrackingDetailTwoPane.setVisibility(View.INVISIBLE);
             }
         }
+
+        // I don't intend to save the state of the selected position,
+        // because the configuration change on the tablet switches
+        // between one- and two-pane layouts, and it looks confusing
+        // to turn a tablet, and see a one-pane layout with an item selected.
+        mSelectedPosition = -1;
 
         // initialize the AdMob view
         AdView mAdView = (AdView) findViewById(R.id.adView);
@@ -413,6 +420,8 @@ public class TrackingNumberListActivity
                 if (mTrackingDetailTwoPane != null) {
                     mTrackingDetailTwoPane.setVisibility(View.INVISIBLE);
                 }
+                mSelectedPosition = -1;
+
                 break;
 
             case R.id.nav_archive:
@@ -420,6 +429,8 @@ public class TrackingNumberListActivity
                 if (mTrackingDetailTwoPane != null) {
                     mTrackingDetailTwoPane.setVisibility(View.INVISIBLE);
                 }
+                mSelectedPosition = -1;
+
                 break;
 
             // TODO add Settings activity
@@ -489,6 +500,8 @@ public class TrackingNumberListActivity
 
         @Override
         public void onBindViewHolder(final LatestEventsViewHolder holder, int position) {
+            holder.itemView.setSelected(mSelectedPosition == position);
+
             mCursor.moveToPosition(position);
 
             // set the package id
@@ -540,6 +553,10 @@ public class TrackingNumberListActivity
                 @Override
                 public void onClick(View v) {
                     if (mTwoPane) {
+                        notifyItemChanged(mSelectedPosition);
+                        mSelectedPosition = holder.getLayoutPosition();
+                        notifyItemChanged(mSelectedPosition);
+
                         Bundle arguments = new Bundle();
                         arguments.putString(TrackingNumberDetailFragment.ARG_PACKAGE_ID, holder.mPackageId);
                         TrackingNumberDetailFragment fragment = new TrackingNumberDetailFragment();
@@ -624,6 +641,7 @@ public class TrackingNumberListActivity
                         if (mTrackingDetailTwoPane != null) {
                             mTrackingDetailTwoPane.setVisibility(View.INVISIBLE);
                         }
+                        mSelectedPosition = -1;
 
                         return true;
 
@@ -637,6 +655,7 @@ public class TrackingNumberListActivity
                         if (mTrackingDetailTwoPane != null) {
                             mTrackingDetailTwoPane.setVisibility(View.INVISIBLE);
                         }
+                        mSelectedPosition = -1;
 
                         return true;
 
@@ -647,6 +666,7 @@ public class TrackingNumberListActivity
                         if (mTrackingDetailTwoPane != null) {
                             mTrackingDetailTwoPane.setVisibility(View.INVISIBLE);
                         }
+                        mSelectedPosition = -1;
 
                         return true;
 

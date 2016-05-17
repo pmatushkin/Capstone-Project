@@ -9,7 +9,7 @@ https://android.googlesource.com/platform/frameworks/base/+/kitkat-release/core/
     android:layout_height="wrap_content"
     android:minHeight="?android:attr/listPreferredItemHeight"
     android:mode="twoLine"
-    android:background="?android:attr/selectableItemBackground"
+    android:background="@drawable/package_selector_row"
     >
 
     <ImageView
