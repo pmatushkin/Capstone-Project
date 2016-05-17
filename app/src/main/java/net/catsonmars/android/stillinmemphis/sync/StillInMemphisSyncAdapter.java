@@ -453,6 +453,7 @@ public class StillInMemphisSyncAdapter extends AbstractThreadedSyncAdapter {
             Date currentDate = new Date();
 
             packageValues.put(TrackingContract.PackagesEntry.COLUMN_TRACKING_NUMBER, trackingNumber);
+            packageValues.put(TrackingContract.PackagesEntry.COLUMN_DESCRIPTION, trackingNumber);
             packageValues.put(TrackingContract.PackagesEntry.COLUMN_ARCHIVED, 0);
             packageValues.put(TrackingContract.PackagesEntry.COLUMN_DATE_ADDED, currentDate.getTime());
 
