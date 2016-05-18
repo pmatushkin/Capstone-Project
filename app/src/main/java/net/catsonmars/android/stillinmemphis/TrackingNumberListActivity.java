@@ -595,7 +595,10 @@ public class TrackingNumberListActivity
         }
 
         public void swapCursor(Cursor newCursor) {
+            if (mCursor != null && !mCursor.isClosed())
+                mCursor.close();
             mCursor = newCursor;
+
             notifyDataSetChanged();
         }
 

@@ -217,7 +217,10 @@ public class TrackingNumberDetailFragment
         public void swapCursor(Cursor newCursor) {
             Log.d(TAG, "swapCursor");
 
+            if (mCursor != null && !mCursor.isClosed())
+                mCursor.close();
             mCursor = newCursor;
+
             notifyDataSetChanged();
         }
 
