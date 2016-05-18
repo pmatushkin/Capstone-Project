@@ -301,6 +301,7 @@ public class TrackingNumberListActivity
                             menuItemAddPackage.collapseActionView();
                             StillInMemphisSyncService.syncImmediatelyWithTrackingNumber(context, String.valueOf(v.getText()));
                             refresh();
+                            v.setText("");
                             return true;
                         } else {
                             return false;
