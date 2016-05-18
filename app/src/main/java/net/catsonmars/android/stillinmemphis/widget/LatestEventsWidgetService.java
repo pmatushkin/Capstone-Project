@@ -86,9 +86,10 @@ public class LatestEventsWidgetService extends RemoteViewsService {
                 String sortOrder = TrackingContract.EventsEntry.COLUMN_TIMESTAMP + " DESC";
                 data = getContentResolver().query(TrackingContract.PackagesEntry.buildPackagesWithLatestEventUri(),
                         PACKAGES_COLUMNS,
-                        null,
-                        null,
+                        TrackingContract.PackagesEntry.COLUMN_ARCHIVED + " = 0", // selection
+                        null, // selection args
                         sortOrder);
+
                 Log.d(TAG, "onDataSetChanged returned records: " + getCount());
 
                 Binder.restoreCallingIdentity(identityToken);
