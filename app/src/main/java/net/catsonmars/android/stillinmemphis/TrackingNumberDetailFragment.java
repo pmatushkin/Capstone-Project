@@ -251,7 +251,9 @@ public class TrackingNumberDetailFragment
                 String eventDate = mCursor.getString(COL_EVENT_DATE);
                 String eventTime = mCursor.getString(COL_EVENT_TIME);
 
-                eventDescriptionString = String.format("%s, %s: %s", eventDate, eventTime, eventDescription);
+                String eventDateTimeString = FormatUtils.formatUSPSDateTime(eventDate, eventTime);
+
+                eventDescriptionString = String.format("%s: %s", eventDateTimeString, eventDescription);
             } else {
                 eventDescriptionString = eventDescription;
             }
