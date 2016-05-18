@@ -445,6 +445,15 @@ public class StillInMemphisSyncAdapter extends AbstractThreadedSyncAdapter {
             packageId = packageCursor.getLong(packageIdIndex);
 
             deleteAllPackageEvents(packageId);
+
+            // try to bring the package from the archives
+            ContentValues packageValues = new ContentValues();
+            packageValues.put(TrackingContract.PackagesEntry.COLUMN_ARCHIVED, "0");
+            getContext().getContentResolver().update(
+                    TrackingContract.PackagesEntry.CONTENT_URI,
+                    packageValues,
+                    TrackingContract.PackagesEntry._ID + " = ?",
+                    new String[] { String.valueOf(packageId) });
         } else {
             Log.d(TAG, "tracking number " + trackingNumber + " is NOT found in the table");
 
