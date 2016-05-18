@@ -337,18 +337,21 @@ public class TrackingNumberDetailFragment
                         }
 
                         // set up the map marker
+                        LatLng latLng;
                         if (geocodingResults.size() > 0) {
                             Address address = geocodingResults.get(0);
-                            LatLng latLng
-                                    = new LatLng(address.getLatitude(), address.getLongitude());
-
-                            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
-                            mGoogleMap.addMarker(new MarkerOptions()
-                                    .visible(true)
-                                    .title(eventAddress)
-                                    .snippet(eventDescriptionString)
-                                    .position(latLng));
+                            latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                        } else {
+                            // Geographic Center of the Contiguous United States
+                            latLng = new LatLng(39.8333314, -98.6008429);
                         }
+
+                        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
+                        mGoogleMap.addMarker(new MarkerOptions()
+                                .visible(true)
+                                .title(eventAddress)
+                                .snippet(eventDescriptionString)
+                                .position(latLng));
                     } catch (Exception e) {
                         Log.e(TAG, e.toString());
                     }
