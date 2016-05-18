@@ -10,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
+import net.catsonmars.android.stillinmemphis.FormatUtils;
 import net.catsonmars.android.stillinmemphis.R;
 import net.catsonmars.android.stillinmemphis.TrackingNumberDetailFragment;
 import net.catsonmars.android.stillinmemphis.data.TrackingContract;
@@ -127,7 +128,9 @@ public class LatestEventsWidgetService extends RemoteViewsService {
                     String eventDate = data.getString(COL_EVENT_DATE);
                     String eventTime = data.getString(COL_EVENT_TIME);
 
-                    eventDescriptionString = String.format("%s, %s: %s", eventDate, eventTime, eventDescription);
+                    String eventDateTimeString = FormatUtils.formatUSPSDateTime(eventDate, eventTime);
+
+                    eventDescriptionString = String.format("%s: %s", eventDateTimeString, eventDescription);
                 } else {
                     eventDescriptionString = eventDescription;
                 }
