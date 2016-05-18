@@ -13,7 +13,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
-import net.catsonmars.android.stillinmemphis.BuildConfig;
 import net.catsonmars.android.stillinmemphis.R;
 import net.catsonmars.android.stillinmemphis.data.TrackingContract;
 
@@ -76,14 +75,20 @@ public class StillInMemphisSyncAdapter extends AbstractThreadedSyncAdapter {
         Log.d(TAG, "StillInMemphisSyncAdapter.StillInMemphisSyncAdapter( , )");
     }
 
-    public StillInMemphisSyncAdapter(Context context, boolean autoInitialize, boolean allowParallelSyncs) {
+    public StillInMemphisSyncAdapter(Context context,
+                                     boolean autoInitialize,
+                                     boolean allowParallelSyncs) {
         super(context, autoInitialize, allowParallelSyncs);
 
         Log.d(TAG, "StillInMemphisSyncAdapter.StillInMemphisSyncAdapter( , , )");
     }
 
     @Override
-    public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
+    public void onPerformSync(Account account,
+                              Bundle extras,
+                              String authority,
+                              ContentProviderClient provider,
+                              SyncResult syncResult) {
         Log.d(TAG, "StillInMemphisSyncAdapter.onPerformSync()");
 
         // get tracking numbers to sync
@@ -112,13 +117,15 @@ public class StillInMemphisSyncAdapter extends AbstractThreadedSyncAdapter {
                     Document document = documentBuilder.newDocument();
 
                     Element root = document.createElement("TrackFieldRequest");
-                    root.setAttribute("USERID", BuildConfig.USPS_WEB_TOOLS_API_KEY);
+                    String apiKey = getContext().getResources().getString(R.string.usps_api_key);
+                    root.setAttribute("USERID", apiKey);
                     document.appendChild(root);
 
                     Element trackIDElement;
 
                     // add next (no more than) MAX_TRACKING_NUMBERS_COUNT tracking numbers
-                    while ((trackingNumberCount <= MAX_TRACKING_NUMBERS_COUNT) && (trackingNumberPosition < trackingNumbersToSync.length)) {
+                    while ((trackingNumberCount <= MAX_TRACKING_NUMBERS_COUNT)
+                            && (trackingNumberPosition < trackingNumbersToSync.length)) {
                         trackIDElement = document.createElement("TrackID");
                         trackIDElement.setAttribute("ID", trackingNumbersToSync[trackingNumberPosition]);
                         root.appendChild(trackIDElement);
@@ -206,9 +213,11 @@ public class StillInMemphisSyncAdapter extends AbstractThreadedSyncAdapter {
         if (documentBuilder != null) {
             try {
                 // parse the response
-                Document document = documentBuilder.parse(new InputSource(new StringReader(responseString)));
+                Document document =
+                        documentBuilder.parse(new InputSource(new StringReader(responseString)));
 
-                // For error events, always use the smallest Date value to display them at the bottom of the list.
+                // For error events, always use the smallest Date value
+                // to display them at the bottom of the list.
                 // So we initialize it here, before any processing takes place.
                 mErrorTimestamp = new Date();
 
@@ -385,7 +394,8 @@ public class StillInMemphisSyncAdapter extends AbstractThreadedSyncAdapter {
 
             retValues.put(TrackingContract.EventsEntry.COLUMN_PACKAGE_ID, packageId);
             retValues.put(TrackingContract.EventsEntry.COLUMN_EVENT_ORDER, trackDetailElementIndex);
-            retValues.put(TrackingContract.EventsEntry.COLUMN_TYPE, TrackingContract.EventsEntry.TYPE_EVENT);
+            retValues.put(TrackingContract.EventsEntry.COLUMN_TYPE,
+                    TrackingContract.EventsEntry.TYPE_EVENT);
             // No need to do it here, because the date will be normalized,
             // and the column updated, in bulkInsert().
             //long normalizedDate = TrackingContract.normalizeDate(date, time);

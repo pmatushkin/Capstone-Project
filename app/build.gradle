@@ -26,9 +26,6 @@ android {
             signingConfig signingConfigs.release
         }
     }
-    buildTypes.each {
-        it.buildConfigField 'String', 'USPS_WEB_TOOLS_API_KEY', '"USPS_WEB_TOOLS_API_KEY"'
-    }
 }
 
 dependencies {
