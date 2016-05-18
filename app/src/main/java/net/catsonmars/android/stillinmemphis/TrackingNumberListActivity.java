@@ -560,7 +560,12 @@ public class TrackingNumberListActivity
                         notifyItemChanged(mSelectedPosition);
 
                         Bundle arguments = new Bundle();
-                        arguments.putString(TrackingNumberDetailFragment.ARG_PACKAGE_ID, holder.mPackageId);
+                        arguments.putString(
+                                TrackingNumberDetailFragment.ARG_PACKAGE_ID,
+                                holder.mPackageId);
+//                        arguments.putCharSequence(
+//                                TrackingNumberDetailFragment.ARG_PACKAGE_DESCRIPTION,
+//                                holder.mIdView.getText());
                         TrackingNumberDetailFragment fragment = new TrackingNumberDetailFragment();
                         fragment.setArguments(arguments);
                         getSupportFragmentManager().beginTransaction()
@@ -572,7 +577,12 @@ public class TrackingNumberListActivity
                     } else {
                         Context context = v.getContext();
                         Intent intent = new Intent(context, TrackingNumberDetailActivity.class);
-                        intent.putExtra(TrackingNumberDetailFragment.ARG_PACKAGE_ID, holder.mPackageId);
+                        intent.putExtra(
+                                TrackingNumberDetailFragment.ARG_PACKAGE_ID,
+                                holder.mPackageId);
+                        intent.putExtra(
+                                TrackingNumberDetailFragment.ARG_PACKAGE_DESCRIPTION,
+                                holder.mIdView.getText());
 
                         context.startActivity(intent);
                     }

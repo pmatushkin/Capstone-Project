@@ -50,11 +50,13 @@ public class TrackingNumberDetailFragment
      * that this fragment represents.
      */
     public static final String ARG_PACKAGE_ID = "package_id";
+    public static final String ARG_PACKAGE_DESCRIPTION = "package_description";
 
     /**
      * The package id this fragment is presenting.
      */
     private String mPackageId;
+    private String mPackageDescription;
 
     private PackageEventsAdapter mPackageEventsAdapter;
     private View mRecyclerView;
@@ -115,6 +117,11 @@ public class TrackingNumberDetailFragment
         if (getArguments().containsKey(ARG_PACKAGE_ID)) {
             mPackageId = getArguments().getString(ARG_PACKAGE_ID);
         }
+        if (getArguments().containsKey(ARG_PACKAGE_DESCRIPTION)) {
+            mPackageDescription = getArguments().getString(ARG_PACKAGE_DESCRIPTION);
+        } else {
+            mPackageDescription = "";
+        }
 
         mPackageEventsAdapter = new PackageEventsAdapter();
 
@@ -132,7 +139,7 @@ public class TrackingNumberDetailFragment
 
         CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) getActivity().findViewById(R.id.toolbar_layout);
         if (appBarLayout != null) {
-            appBarLayout.setTitle(mPackageId);
+            appBarLayout.setTitle(mPackageDescription);
         }
 
         View rootView = inflater.inflate(R.layout.trackingnumber_detail, container, false);

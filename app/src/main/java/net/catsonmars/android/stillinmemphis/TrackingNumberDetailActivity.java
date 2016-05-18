@@ -63,6 +63,8 @@ public class TrackingNumberDetailActivity extends AppCompatActivity {
             Bundle arguments = new Bundle();
             arguments.putString(TrackingNumberDetailFragment.ARG_PACKAGE_ID,
                     getIntent().getStringExtra(TrackingNumberDetailFragment.ARG_PACKAGE_ID));
+            arguments.putString(TrackingNumberDetailFragment.ARG_PACKAGE_DESCRIPTION,
+                    getIntent().getStringExtra(TrackingNumberDetailFragment.ARG_PACKAGE_DESCRIPTION));
             TrackingNumberDetailFragment fragment = new TrackingNumberDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
