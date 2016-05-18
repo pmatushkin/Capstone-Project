@@ -6,7 +6,7 @@
 
     <color name="colorPrimary">#8BC34A</color>
     <color name="colorPrimaryDark">#689F38</color>
-    <color name="colorAccent">#FFC400</color>
+    <color name="colorAccent">#FFAB00</color>
 
     <!--app icon colors-->
     <!--<color name="colorMenuIcon">#FFFFFF</color>-->
@@ -29,5 +29,11 @@
     <!--text colors-->
     <color name="primary_text">#212121</color>
     <color name="secondary_text">#727272</color>
+
+    <!--text protection scrim colors-->
+    <color name="translucent_scrim_top">#26000000</color>
+    <color name="translucent_scrim_top_center">#0C000000</color>
+    <color name="translucent_scrim_bottom">#2A000000</color>
+    <color name="translucent_scrim_bottom_center">#0D000000</color>
 
 </resources>
