@@ -300,7 +300,7 @@ public class TrackingNumberListActivity
                             actionView.clearFocus();
                             menuItemAddPackage.collapseActionView();
                             StillInMemphisSyncService.syncImmediatelyWithTrackingNumber(context, String.valueOf(v.getText()));
-                            refresh();
+//                            refresh();
                             v.setText("");
                             return true;
                         } else {
