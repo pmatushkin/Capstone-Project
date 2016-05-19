@@ -686,6 +686,11 @@ public class TrackingNumberListActivity
                         return true;
 
                     case R.id.delete_package:
+                        // delete package events
+                        contentResolver.delete(TrackingContract.EventsEntry.CONTENT_URI,
+                                TrackingContract.EventsEntry.COLUMN_PACKAGE_ID + " = ?",
+                                new String[] { mPackageId });
+                        // delete package
                         contentResolver.delete(TrackingContract.PackagesEntry.CONTENT_URI,
                                 TrackingContract.PackagesEntry._ID + "=?",
                                 new String[] { mPackageId });
