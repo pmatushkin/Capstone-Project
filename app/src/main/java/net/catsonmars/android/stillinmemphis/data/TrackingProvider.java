@@ -19,6 +19,7 @@ import net.catsonmars.android.stillinmemphis.sync.StillInMemphisSyncAdapter;
  */
 public class TrackingProvider extends ContentProvider {
     private static final String TAG = "TrackingProvider";
+    private static final String TAG_PRINT_DATABASE = "PRINT_DATABASE";
 
     // The URI Matcher used by this content provider.
     private static final UriMatcher sUriMatcher = buildUriMatcher();
@@ -261,20 +262,30 @@ public class TrackingProvider extends ContentProvider {
 
         switch (match) {
             case EVENTS: {
+                printDatabase("before insert EVENTS");
+
                 normalizeEventDate(values);
                 long _id = db.insert(TrackingContract.EventsEntry.TABLE_NAME, null, values);
                 if ( _id > 0 )
                     retUri = TrackingContract.EventsEntry.buildEventUri(_id);
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
+
+                printDatabase("after insert EVENTS");
+
                 break;
             }
             case PACKAGES: {
+                printDatabase("before insert PACKAGES");
+
                 long _id = db.insert(TrackingContract.PackagesEntry.TABLE_NAME, null, values);
                 if ( _id > 0 )
                     retUri = TrackingContract.PackagesEntry.buildPackageUri(_id);
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
+
+                printDatabase("after insert PACKAGES");
+
                 break;
             }
             default:
@@ -297,6 +308,8 @@ public class TrackingProvider extends ContentProvider {
 
         switch (match) {
             case EVENTS: {
+                printDatabase("before bulkInsert EVENTS");
+
                 db.beginTransaction();
                 int retCount = 0;
                 try {
@@ -314,9 +327,12 @@ public class TrackingProvider extends ContentProvider {
                 getContext().getContentResolver().notifyChange(uri, null);
                 updateRemotes();
 
+                printDatabase("after bulkInsert EVENTS");
+
                 return retCount;
             }
             default:
+                printDatabase("before/after bulkInsert default");
                 return super.bulkInsert(uri, values);
         }
     }
@@ -335,14 +351,20 @@ public class TrackingProvider extends ContentProvider {
 
         switch (match) {
             case EVENTS:
+                printDatabase("before delete EVENTS");
+
                 retDeleted = db.delete(
                         TrackingContract.EventsEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             case PACKAGES:
+                printDatabase("before delete PACKAGES");
+
                 retDeleted = db.delete(
                         TrackingContract.PackagesEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             default:
+                printDatabase("before delete default");
+
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
 
@@ -351,6 +373,8 @@ public class TrackingProvider extends ContentProvider {
             getContext().getContentResolver().notifyChange(uri, null);
             updateRemotes();
         }
+
+        printDatabase("after delete");
 
         return retDeleted;
     }
@@ -366,6 +390,8 @@ public class TrackingProvider extends ContentProvider {
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         Log.d(TAG, "TrackingProvider.update()");
+
+        printDatabase("before update");
 
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
@@ -390,6 +416,81 @@ public class TrackingProvider extends ContentProvider {
             updateRemotes();
         }
 
+        printDatabase("after update");
+
         return retUpdated;
+    }
+
+    private void printDatabase(String method) {
+        Log.d(TAG_PRINT_DATABASE, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        Cursor packageCursor = query(TrackingContract.PackagesEntry.CONTENT_URI,
+                null /*projection*/,
+                null /*selection*/,
+                null /*selection args*/,
+                null /*sort order */);
+        if (packageCursor.moveToFirst()) {
+            Log.d(TAG_PRINT_DATABASE, "PACKAGES " + method);
+
+            do {
+                int packageIdIndex = packageCursor.getColumnIndex(TrackingContract.PackagesEntry._ID);
+                int packageNumberIndex = packageCursor.getColumnIndex(TrackingContract.PackagesEntry.COLUMN_TRACKING_NUMBER);
+                int packageDescriptionIndex = packageCursor.getColumnIndex(TrackingContract.PackagesEntry.COLUMN_DESCRIPTION);
+
+                Log.d(TAG_PRINT_DATABASE, String.format("%s: %s (%s)",
+                        packageCursor.getString(packageIdIndex),
+                        packageCursor.getString(packageNumberIndex),
+                        packageCursor.getString(packageDescriptionIndex)));
+            } while (packageCursor.moveToNext());
+        } else {
+            Log.d(TAG_PRINT_DATABASE, "PACKAGES " + method + " EMPTY");
+        }
+        packageCursor.close();
+
+        Log.d(TAG_PRINT_DATABASE, "");
+
+        Cursor eventsCursor = query(TrackingContract.EventsEntry.CONTENT_URI,
+                null /*projection*/,
+                null /*selection*/,
+                null /*selection args*/,
+                null /*sort order */);
+        if (eventsCursor.moveToFirst()) {
+            Log.d(TAG_PRINT_DATABASE, "EVENTS " + method);
+
+            do {
+                int eventIdIndex = eventsCursor.getColumnIndex(TrackingContract.EventsEntry._ID);
+                int eventOrderIndex = eventsCursor.getColumnIndex(TrackingContract.EventsEntry.COLUMN_EVENT_ORDER);
+                int eventPackageIdIndex = eventsCursor.getColumnIndex(TrackingContract.EventsEntry.COLUMN_PACKAGE_ID);
+                int eventDescriptionIndex = eventsCursor.getColumnIndex(TrackingContract.EventsEntry.COLUMN_EVENT);
+
+                Log.d(TAG_PRINT_DATABASE, String.format("%s (%s): [%s] %s",
+                        eventsCursor.getString(eventIdIndex),
+                        eventsCursor.getString(eventOrderIndex),
+                        eventsCursor.getString(eventPackageIdIndex),
+                        eventsCursor.getString(eventDescriptionIndex)));
+            } while (eventsCursor.moveToNext());
+        } else {
+            Log.d(TAG_PRINT_DATABASE, "EVENTS " + method + " EMPTY");
+        }
+        eventsCursor.close();
+    }
+
+    private void printCursor(String method, Cursor cursor) {
+        if (cursor.moveToFirst()) {
+            Log.d(TAG_PRINT_DATABASE, "CURSOR " + method);
+
+            do {
+                int packageIdIndex = cursor.getColumnIndex(TrackingContract.PackagesEntry._ID);
+                int packageNumberIndex = cursor.getColumnIndex(TrackingContract.PackagesEntry.COLUMN_TRACKING_NUMBER);
+                int packageDescriptionIndex = cursor.getColumnIndex(TrackingContract.PackagesEntry.COLUMN_DESCRIPTION);
+
+                Log.d(TAG_PRINT_DATABASE, String.format("%s: %s (%s)",
+                        cursor.getString(packageIdIndex),
+                        cursor.getString(packageNumberIndex),
+                        cursor.getString(packageDescriptionIndex)));
+            } while (cursor.moveToNext());
+        } else {
+            Log.d(TAG_PRINT_DATABASE, "CURSOR " + method + " EMPTY");
+        }
+
     }
 }
