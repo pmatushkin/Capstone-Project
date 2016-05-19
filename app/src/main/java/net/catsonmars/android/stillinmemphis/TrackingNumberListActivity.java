@@ -297,11 +297,15 @@ public class TrackingNumberListActivity
                     @Override
                     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                         if (actionId == EditorInfo.IME_ACTION_DONE) {
+                            String trackingNumber = String.valueOf(v.getText()).trim();
+                            v.setText("");
+
                             actionView.clearFocus();
                             menuItemAddPackage.collapseActionView();
-                            StillInMemphisSyncService.syncImmediatelyWithTrackingNumber(context, String.valueOf(v.getText()));
-//                            refresh();
-                            v.setText("");
+                            if (!"".equals(trackingNumber)) {
+                                refresh(trackingNumber);
+                            }
+
                             return true;
                         } else {
                             return false;
@@ -459,6 +463,12 @@ public class TrackingNumberListActivity
         Log.d(TAG, "refresh");
 
         StillInMemphisSyncService.syncImmediately(this);
+    }
+
+    private void refresh(String trackingNumber) {
+        Log.d(TAG, "refresh(trackingNumber)");
+
+        StillInMemphisSyncService.syncImmediatelyWithTrackingNumber(this, trackingNumber);
     }
 
     private void updateRefreshingUI() {
