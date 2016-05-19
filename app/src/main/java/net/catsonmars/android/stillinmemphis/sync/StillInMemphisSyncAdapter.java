@@ -167,8 +167,10 @@ public class StillInMemphisSyncAdapter extends AbstractThreadedSyncAdapter {
                         builder.scheme(context.getString(R.string.usps_scheme))
                                 .authority(context.getString(R.string.usps_authority))
                                 .appendPath(context.getString(R.string.usps_path))
-                                .appendQueryParameter(context.getString(R.string.usps_api_parameter), context.getString(R.string.usps_api_value))
-                                .appendQueryParameter(context.getString(R.string.usps_xml_parameter), requestString);
+                                .appendQueryParameter(context.getString(R.string.usps_api_parameter),
+                                        context.getString(R.string.usps_api_value))
+                                .appendQueryParameter(context.getString(R.string.usps_xml_parameter),
+                                        requestString);
                         Uri uri = builder.build();
                         String url = uri.toString();
                         Log.d(TAG, url);
@@ -453,6 +455,7 @@ public class StillInMemphisSyncAdapter extends AbstractThreadedSyncAdapter {
 
             int packageIdIndex = packageCursor.getColumnIndex(TrackingContract.PackagesEntry._ID);
             packageId = packageCursor.getLong(packageIdIndex);
+            packageCursor.close();
 
             deleteAllPackageEvents(packageId);
 
@@ -467,8 +470,9 @@ public class StillInMemphisSyncAdapter extends AbstractThreadedSyncAdapter {
         } else {
             Log.d(TAG, "tracking number " + trackingNumber + " is NOT found in the table");
 
-            ContentValues packageValues = new ContentValues();
+            packageCursor.close();
 
+            ContentValues packageValues = new ContentValues();
             Date currentDate = new Date();
 
             packageValues.put(TrackingContract.PackagesEntry.COLUMN_TRACKING_NUMBER, trackingNumber);
@@ -487,8 +491,6 @@ public class StillInMemphisSyncAdapter extends AbstractThreadedSyncAdapter {
         }
 
         Log.d(TAG, "package id: " + packageId);
-
-        packageCursor.close();
 
         return packageId;
     }
