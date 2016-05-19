@@ -336,6 +336,14 @@ public class TrackingNumberDetailFragment
                             currGeocodingAttempts++;
                         }
 
+                        // set up zoom level
+                        // use country-level zoom by default
+                        int zoom = 3;
+                        // zoom in to the city level if there is a city name
+                        if (!"".equals(eventCity)) {
+                            zoom = 12;
+                        }
+
                         // set up the map marker
                         LatLng latLng;
                         if (geocodingResults.size() > 0) {
@@ -344,9 +352,10 @@ public class TrackingNumberDetailFragment
                         } else {
                             // Geographic Center of the Contiguous United States
                             latLng = new LatLng(39.8333314, -98.6008429);
+                            zoom = 3;
                         }
 
-                        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
+                        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
                         mGoogleMap.addMarker(new MarkerOptions()
                                 .visible(true)
                                 .title(eventAddress)
