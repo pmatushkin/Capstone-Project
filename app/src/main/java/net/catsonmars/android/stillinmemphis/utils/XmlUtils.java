@@ -1,4 +1,4 @@
-package net.catsonmars.android.stillinmemphis;
+package net.catsonmars.android.stillinmemphis.utils;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

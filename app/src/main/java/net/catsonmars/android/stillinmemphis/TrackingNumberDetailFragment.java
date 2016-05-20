@@ -30,6 +30,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import net.catsonmars.android.stillinmemphis.data.TrackingContract;
 import net.catsonmars.android.stillinmemphis.ui.DividerItemDecoration;
+import net.catsonmars.android.stillinmemphis.utils.FormatUtils;
 
 import java.util.List;
 import java.util.Locale;

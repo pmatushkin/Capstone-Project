@@ -45,6 +45,8 @@ import net.catsonmars.android.stillinmemphis.data.TrackingContract;
 import net.catsonmars.android.stillinmemphis.sync.StillInMemphisSyncAdapter;
 import net.catsonmars.android.stillinmemphis.sync.StillInMemphisSyncService;
 import net.catsonmars.android.stillinmemphis.ui.DividerItemDecoration;
+import net.catsonmars.android.stillinmemphis.utils.FormatUtils;
+import net.catsonmars.android.stillinmemphis.utils.NetworkUtils;
 
 /**
  * An activity representing a list of Tracking Numbers. This activity

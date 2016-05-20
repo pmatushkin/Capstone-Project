@@ -10,7 +10,7 @@ import android.widget.AdapterView;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
-import net.catsonmars.android.stillinmemphis.FormatUtils;
+import net.catsonmars.android.stillinmemphis.utils.FormatUtils;
 import net.catsonmars.android.stillinmemphis.R;
 import net.catsonmars.android.stillinmemphis.TrackingNumberDetailFragment;
 import net.catsonmars.android.stillinmemphis.data.TrackingContract;

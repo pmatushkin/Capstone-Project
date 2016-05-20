@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import net.catsonmars.android.stillinmemphis.sync.StillInMemphisSyncService;
+import net.catsonmars.android.stillinmemphis.utils.NetworkUtils;
 
 /**
  * Created by pmatushkin on 5/19/2016.

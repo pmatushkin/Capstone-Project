@@ -1,4 +1,4 @@
-package net.catsonmars.android.stillinmemphis;
+package net.catsonmars.android.stillinmemphis.utils;
 
 import android.annotation.TargetApi;
 import android.content.Context;

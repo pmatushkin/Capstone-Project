@@ -45,7 +45,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-import static net.catsonmars.android.stillinmemphis.XmlUtils.asList;
+import static net.catsonmars.android.stillinmemphis.utils.XmlUtils.asList;
 
 /**
  * Created by pmatushkin on 4/21/2016.
