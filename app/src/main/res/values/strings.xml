@@ -43,4 +43,6 @@
     <string name="drawer_open">open drawer</string>
     <string name="drawer_close">close drawer</string>
 
+    <!--error messages-->
+    <string name="error_network_unavailable">Network is unavailable.</string>
 </resources>

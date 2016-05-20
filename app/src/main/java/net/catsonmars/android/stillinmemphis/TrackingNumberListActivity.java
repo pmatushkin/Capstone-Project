@@ -283,7 +283,6 @@ public class TrackingNumberListActivity
         getMenuInflater().inflate(R.menu.main, menu);
 
         // set up the action view listener
-        final Context context = this;
         final MenuItem menuItemAddPackage = menu.findItem(R.id.action_add_package);
         if (MODE_ARCHIVE == mListMode) {
             menuItemAddPackage.setVisible(false);
@@ -334,6 +333,7 @@ public class TrackingNumberListActivity
 
             case android.R.id.home:
                 mDrawerLayout.openDrawer(GravityCompat.START);
+
                 return true;
 
             default:
@@ -462,13 +462,36 @@ public class TrackingNumberListActivity
     private void refresh() {
         Log.d(TAG, "refresh");
 
-        StillInMemphisSyncService.syncImmediately(this);
+        if (!NetworkUtils.isAirplaneModeOn(this)
+                && NetworkUtils.isNetworkAvailable(this)) {
+            StillInMemphisSyncService.syncImmediately(this);
+        } else {
+            // cancel sync
+            Intent intent = new Intent(StillInMemphisSyncAdapter.BROADCAST_ACTION_STATE_CHANGE)
+                    .putExtra(StillInMemphisSyncAdapter.EXTRA_REFRESHING, false)
+                    .setPackage(getPackageName());
+
+            sendBroadcast(intent);
+
+            String error = getResources().getString(R.string.error_network_unavailable);
+            Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void refresh(String trackingNumber) {
         Log.d(TAG, "refresh(trackingNumber)");
 
-        StillInMemphisSyncService.syncImmediatelyWithTrackingNumber(this, trackingNumber);
+        if (!NetworkUtils.isAirplaneModeOn(this)
+                && NetworkUtils.isNetworkAvailable(this)) {
+            StillInMemphisSyncService.syncImmediatelyWithTrackingNumber(this, trackingNumber);
+        } else {
+            // don't sync
+            String error = getResources().getString(R.string.error_network_unavailable);
+            Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
+
+            StillInMemphisSyncAdapter syncAdapter = new StillInMemphisSyncAdapter(this, false);
+            syncAdapter.addpackageWithError(trackingNumber, error);
+        }
     }
 
     private void updateRefreshingUI() {
@@ -483,7 +506,8 @@ public class TrackingNumberListActivity
             Log.d(TAG, "mRefreshingReceiver.onReceive");
 
             if (StillInMemphisSyncAdapter.BROADCAST_ACTION_STATE_CHANGE.equals(intent.getAction())) {
-                mIsRefreshing = intent.getBooleanExtra(StillInMemphisSyncAdapter.EXTRA_REFRESHING, false);
+                mIsRefreshing =
+                        intent.getBooleanExtra(StillInMemphisSyncAdapter.EXTRA_REFRESHING, false);
                 updateRefreshingUI();
             }
         }
@@ -574,9 +598,6 @@ public class TrackingNumberListActivity
                         arguments.putString(
                                 TrackingNumberDetailFragment.ARG_PACKAGE_ID,
                                 holder.mPackageId);
-//                        arguments.putCharSequence(
-//                                TrackingNumberDetailFragment.ARG_PACKAGE_DESCRIPTION,
-//                                holder.mIdView.getText());
                         TrackingNumberDetailFragment fragment = new TrackingNumberDetailFragment();
                         fragment.setArguments(arguments);
                         getSupportFragmentManager().beginTransaction()

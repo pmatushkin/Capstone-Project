@@ -132,8 +132,11 @@ public class StillInMemphisSyncService extends Service {
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
 
-        ContentResolver.requestSync(getSyncAccount(context),
-                context.getString(R.string.content_authority), bundle);
+        Account account = getSyncAccount(context);
+        Log.d(TAG, "requesting sync...");
+        ContentResolver.requestSync(account,
+                context.getString(R.string.content_authority),
+                bundle);
     }
 
     /**
@@ -148,8 +151,11 @@ public class StillInMemphisSyncService extends Service {
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
         bundle.putString(StillInMemphisSyncAdapter.EXTRA_TRACKING_NNMBER, trackingNumber);
 
-        ContentResolver.requestSync(getSyncAccount(context),
-                context.getString(R.string.content_authority), bundle);
+        Account account = getSyncAccount(context);
+        Log.d(TAG, "requesting sync...");
+        ContentResolver.requestSync(account,
+                context.getString(R.string.content_authority),
+                bundle);
     }
 
     private static void onAccountCreated(Account newAccount, Context context) {

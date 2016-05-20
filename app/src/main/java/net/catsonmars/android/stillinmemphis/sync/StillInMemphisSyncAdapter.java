@@ -437,6 +437,23 @@ public class StillInMemphisSyncAdapter extends AbstractThreadedSyncAdapter {
         return retValues;
     }
 
+    public void addpackageWithError(String trackingNumber, String errorMessage) {
+        long packageId = addPackage(trackingNumber);
+
+        ContentValues cv = new ContentValues();
+        cv.put(TrackingContract.EventsEntry.COLUMN_PACKAGE_ID, packageId);
+        // event order is always 0 for the error event (this is the only event for this package)
+        cv.put(TrackingContract.EventsEntry.COLUMN_EVENT_ORDER, 0);
+        cv.put(TrackingContract.EventsEntry.COLUMN_TYPE,
+                TrackingContract.EventsEntry.TYPE_ERROR);
+        cv.put(TrackingContract.EventsEntry.COLUMN_TIMESTAMP, new Date().getTime());
+        cv.put(TrackingContract.EventsEntry.COLUMN_EVENT, errorMessage);
+
+        getContext()
+                .getContentResolver()
+                .insert(TrackingContract.EventsEntry.CONTENT_URI, cv);
+    }
+
     private long addPackage(String trackingNumber) {
         Log.d(TAG, "StillInMemphisSyncAdapter.addPackage()");
 

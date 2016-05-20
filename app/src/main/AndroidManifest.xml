@@ -100,6 +100,13 @@
         <meta-data android:name="com.google.android.geo.API_KEY"
             android:value="@string/maps_api_key"/>
 
+        <!--Broadcast receiver for detecting the loss of network-->
+        <receiver android:name=".NetworkReceiver" >
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>
