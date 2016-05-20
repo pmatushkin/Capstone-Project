@@ -61,7 +61,7 @@ public class StillInMemphisSyncAdapter extends AbstractThreadedSyncAdapter {
             = "net.catsonmars.android.stillinmemphis.intent.action.DATA_CHANGE";
     public static final String EXTRA_REFRESHING
             = "net.catsonmars.android.stillinmemphis.intent.extra.REFRESHING";
-    public static final String EXTRA_TRACKING_NNMBER
+    public static final String EXTRA_TRACKING_NUMBER
             = "net.catsonmars.android.stillinmemphis.intent.extra.TRACKING_NUMBER";
 
     // A maximum number of entries in a single tracking request is 10
@@ -92,7 +92,7 @@ public class StillInMemphisSyncAdapter extends AbstractThreadedSyncAdapter {
         Log.d(TAG, "StillInMemphisSyncAdapter.onPerformSync()");
 
         // get tracking numbers to sync
-        String[] trackingNumbersToSync = extras.containsKey(EXTRA_TRACKING_NNMBER) ?
+        String[] trackingNumbersToSync = extras.containsKey(EXTRA_TRACKING_NUMBER) ?
                 getTrackingNumbersToSync(extras)
                 :
                 getTrackingNumbersToSync();
@@ -548,9 +548,9 @@ public class StillInMemphisSyncAdapter extends AbstractThreadedSyncAdapter {
     {
         Log.d(TAG, "StillInMemphisSyncAdapter.getTrackingNumbersToSync(Bundle)");
 
-        if (bundle.containsKey(EXTRA_TRACKING_NNMBER)) {
+        if (bundle.containsKey(EXTRA_TRACKING_NUMBER)) {
             String[] a = new String[1];
-            a[0] = bundle.getString(EXTRA_TRACKING_NNMBER);
+            a[0] = bundle.getString(EXTRA_TRACKING_NUMBER);
 
             return a;
         } else {

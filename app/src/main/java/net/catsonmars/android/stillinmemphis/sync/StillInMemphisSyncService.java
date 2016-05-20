@@ -149,7 +149,7 @@ public class StillInMemphisSyncService extends Service {
         Bundle bundle = new Bundle();
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-        bundle.putString(StillInMemphisSyncAdapter.EXTRA_TRACKING_NNMBER, trackingNumber);
+        bundle.putString(StillInMemphisSyncAdapter.EXTRA_TRACKING_NUMBER, trackingNumber);
 
         Account account = getSyncAccount(context);
         Log.d(TAG, "requesting sync...");
