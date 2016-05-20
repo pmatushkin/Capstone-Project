@@ -24,6 +24,13 @@ public class TestUSPSResponse extends AndroidTestCase {
         deleteDatabase();
     }
 
+    @Override
+    protected void tearDown() throws Exception {
+        deleteDatabase();
+
+        super.tearDown();
+    }
+
     public void testProcessUSPSResponseString() {
         StillInMemphisSyncAdapter syncAdapter = new StillInMemphisSyncAdapter(getContext(), true);
 
