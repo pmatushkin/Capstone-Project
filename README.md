@@ -12,9 +12,9 @@ Still In Memphis (see [xkcd](https://xkcd.com/281/)) is an app built for the And
 ## Instructions
 Still In Memphis uses two APIs, both of which require a key.
 
-Before compiling the project, please obtain an USPS API key following the link to the [instruction page](https://www.usps.com/business/web-tools-apis/welcome.htm). The USPS API key must be then placed into `/app/src/main/res/values/strings.xml` under the key `usps_api_key`
+Before compiling the project, please obtain an USPS API key following the link to the [instruction page](https://www.usps.com/business/web-tools-apis/welcome.htm). The USPS API key must be then placed into [/app/src/main/res/values/strings.xml](https://github.com/pmatushkin/Capstone-Project/tree/master/app/src/main/res/values) under the key `usps_api_key`
 
-Do the same for a Google Maps Android API key following this link to the [instruction page](https://developers.google.com/maps/documentation/android-api/). The Google Maps Android API key must be placed into `/app/src/main/res/values/strings.xml` under the key `maps_api_key`
+Do the same for a Google Maps Android API key following this link to the [instruction page](https://developers.google.com/maps/documentation/android-api/). The Google Maps Android API key must be placed into [/app/src/main/res/values/strings.xml](https://github.com/pmatushkin/Capstone-Project/tree/master/app/src/main/res/values) under the key `maps_api_key`
 
 ## Use cases
 * The user enters a tracking number into the app. The app communicates the tracking number to the USPS API and retrieves a set of tracking events, or a single error event. The entered tracking number is displayed on the Tracking Number List screen along with the description of the most recent event, and a package icon that represents the status of the tracking number. The black icon represents the packages in progress, the green icon represents the delivered packages, and the red icon represents the error reported by the USPS API.
