@@ -38,6 +38,11 @@ Do the same for a Google Maps Android API key following this link to the [instru
 * Icons provided by [Google Design](https://design.google.com/icons/), [Material Design Icons](https://materialdesignicons.com/), and personally [Austin Andrews](https://twitter.com/Templarian)
 
 ## Notes
-* This repository includes the keystore and the passwords used for signing the APK. Both the keystore and the passwords are generated specifically for this app, and included only to demonstrate the capability of the project to successfully assemble the signed release APK. Please don’t use them for anything else. The keystore is located in `keystore/capstone_keystore.jks`
+* This repository includes the keystore and the passwords used for signing the APK. Both the keystore and the passwords are generated specifically for this app, and included only to demonstrate the capability of the project to successfully assemble the signed release APK. Please don’t use them for anything else. The keystore is located in [keystore/capstone_keystore.jks](https://github.com/pmatushkin/Capstone-Project/tree/master/keystore)
 
-* This repository includes the signed release APK of the app as of [b14cb752d052a857a879ecf646489c5a54cde12f](https://github.com/pmatushkin/Capstone-Project/commit/b14cb752d052a857a879ecf646489c5a54cde12f). The APK is located in `/apk/app-release.apk`
+* This repository includes the signed release APK of the app as of [b14cb752d052a857a879ecf646489c5a54cde12f](https://github.com/pmatushkin/Capstone-Project/commit/b14cb752d052a857a879ecf646489c5a54cde12f). The APK is located in [/apk/app-release.apk](https://github.com/pmatushkin/Capstone-Project/tree/master/apk)
+
+* These tracking numbers are provided for the purposes of testing. Please keep in mind that these tracking numbers and the associated events are maintained by USPS, and can be discontinued at any time.
+  * 9405503699300270004035
+  * 9405803699300222655286
+  * 9241990104791668956989
