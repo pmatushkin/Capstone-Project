@@ -326,8 +326,10 @@ public class TrackingNumberListActivity
         }
 
         switch (item.getItemId()) {
-            case R.id.action_settings:
-                // User chose the "Settings" item, show the app settings UI...
+            case R.id.action_about:
+                Intent intent = new Intent(this, AboutActivity.class);
+                this.startActivity(intent);
+
                 return true;
 
             case R.id.action_add_package:
