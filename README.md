@@ -30,6 +30,14 @@ Do the same for a Google Maps Android API key following this link to the [instru
 * The user can delete the previously entered tracking number either from the Active view, or from the Archive view. The tracking number and all its events will be removed from the app.
 
 ## Screenshots
+### Phone
+| Active view | Archive view | Package view | Error view |
+| ------------- | ------------- | ------------- | ------------- |
+| ![Phone active view](https://github.com/pmatushkin/Capstone-Project/blob/master/screenshots/phone_01_active.jpg "Phone active view")  | ![Phone archive view](https://github.com/pmatushkin/Capstone-Project/blob/master/screenshots/phone_02_archive.jpg "Phone archive view") | ![Phone package view](https://github.com/pmatushkin/Capstone-Project/blob/master/screenshots/phone_03_package.jpg "Phone package view") | ![Phone error view](https://github.com/pmatushkin/Capstone-Project/blob/master/screenshots/phone_04_error.jpg "Phone error view") |
+### Tablet
+| Archive view | Package view | Error view |
+| ------------- | ------------- | ------------- |
+| ![Tablet archive view](https://github.com/pmatushkin/Capstone-Project/blob/master/screenshots/tablet_01_archive.jpg "Tablet archive view") | ![Tablet package view](https://github.com/pmatushkin/Capstone-Project/blob/master/screenshots/tablet_02_package.jpg "Tablet package view") | ![Tablet error view](https://github.com/pmatushkin/Capstone-Project/blob/master/screenshots/tablet_03_error.jpg "Tablet error view") |
 
 ## Acknowledgements
 * Information provided by [USPS](http://www.usps.com)
